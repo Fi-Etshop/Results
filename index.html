@@ -4038,7 +4038,7 @@
                 return;
             }
 
-            const result =  fetch(http://74.249.193.181:3000/student/${nationalID});
+            const result =  fetch(`http://74.249.193.181:3000/student/${nationalID}`);
 
             if (result) {
                 const assignment = result["الواجب"] || 0;
