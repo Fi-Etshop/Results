@@ -4022,7 +4022,7 @@
     }
 ];
 
-        function searchGrades() {
+        async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
             const resultsTable = document.getElementById('resultsTable');
@@ -4038,7 +4038,7 @@
                 return;
             }
 
-            const result =  fetch(`https://74.249.193.181:3000/student/${nationalID}`);
+            const result =  await fetch(`https://74.249.193.181:3000/student/${nationalID}`);
 
             if (result) {
                 const assignment = result["الواجب"] || 0;
