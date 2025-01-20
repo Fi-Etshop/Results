@@ -113,7 +113,7 @@
                 return;
             }
 
-            const result =  await fetch(`https://74.249.193.181:3000/student/${nationalID}`)
+            const result =  await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`)
             .then(response => 
                 response.json().then(data => ({
                     data: data,
