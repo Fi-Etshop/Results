@@ -265,33 +265,40 @@
             // Show loading spinner
             loadingSpinner.classList.remove('hidden');
 
+            // استخدام نفس الطريقة الأصلية في الكود القديم
             try {
-                const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`);
-                const result = await response.json();
+                const result = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`)
+                    .then(response => 
+                        response.json().then(data => ({
+                            data: data,
+                            status: response.status
+                        }))
+                    ).then(result => {
+                        // Hide loading spinner
+                        loadingSpinner.classList.add('hidden');
 
-                // Hide loading spinner
-                loadingSpinner.classList.add('hidden');
+                        if (result.status === 200 && result.data) {
+                            const assignment = result.data["الواجب"] || 0;
+                            // تحقق من وجود الحضور في البيانات، وإلا استخدم البحث كبديل
+                            const attendance = result.data["الحضور"] || result.data["بحث"] || 0;
+                            const finalExam = result.data["الفاينال"] || 0;
 
-                if (response.ok && result) {
-                    const assignment = result["الواجب"] || 0;
-                    const attendance = result["الحضور"] || 0; // Changed from research to attendance
-                    const finalExam = result["الفاينال"] || 0;
-
-                    resultsTable.classList.remove('hidden');
-                    resultsBody.innerHTML = `
-                        <tr>
-                            <td>${result["الاسم"] || 'غير محدد'}</td>
-                            <td>${result["الكود"] || 'غير محدد'}</td>
-                            <td>${assignment} / 280</td>
-                            <td>${attendance} / 20</td>
-                            <td>${finalExam} / 50</td>
-                        </tr>
-                    `;
-                    quote.classList.remove('hidden');
-                } else {
-                    errorMessage.textContent = "الرقم القومي الذي أدخلته غير صحيح أو لا توجد نتائج متاحة";
-                    errorMessage.classList.remove('hidden');
-                }
+                            resultsTable.classList.remove('hidden');
+                            resultsBody.innerHTML = `
+                                <tr>
+                                    <td>${result.data["الاسم"]}</td>
+                                    <td>${result.data["الكود"]}</td>
+                                    <td>${assignment} / 280</td>
+                                    <td>${attendance} / 20</td>
+                                    <td>${finalExam} / 50</td>
+                                </tr>
+                            `;
+                            quote.classList.remove('hidden');
+                        } else {
+                            errorMessage.textContent = "الرقم القومي الذي أدخلته خطأ";
+                            errorMessage.classList.remove('hidden');
+                        }
+                    });
             } catch (error) {
                 // Hide loading spinner
                 loadingSpinner.classList.add('hidden');
