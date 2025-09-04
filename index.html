@@ -254,7 +254,7 @@
 </head>
 <body>
     <img src="logo.png" alt="logo" class="logo">
-    <h1>نتيجة السنة الأولى</h1>
+    <h1>نتائج السنة الأولى كاملة</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
@@ -266,23 +266,23 @@
 
     <!-- Student Info -->
     <div id="studentInfo" class="student-info hidden">
-        <h3>معلومات الملتحق</h3>
+        <h3>معلومات الطالب</h3>
         <p><strong>الاسم:</strong> <span id="studentName"></span></p>
         <p><strong>الكود:</strong> <span id="studentCode"></span></p>
     </div>
 
     <div id="resultsSection" class="results-section hidden">
         <!-- الترم الأول -->
-        <h2>الترم الأول</h2>
+        <h2>نتيجة الترم الأول</h2>
         <div class="table-container">
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
-                        <th>الحضور</th>
+                        <th>المادة</th>
                         <th>الواجب</th>
-                        <th>البحث</th>
-                        <th>ميدترم</th>
-                        <th>فاينال</th>
+                        <th>الحضور</th>
+                        <th>الفاينال</th>
+                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term1Body"></tbody>
@@ -290,14 +290,16 @@
         </div>
 
         <!-- الترم الثاني -->
-        <h2>الترم الثاني</h2>
+        <h2>نتيجة الترم الثاني</h2>
         <div class="table-container">
             <table id="term2Table">
                 <thead>
                     <tr class="term2-header">
-                        <th>الحضور</th>
+                        <th>المادة</th>
                         <th>الواجب</th>
-                        <th>فاينال</th>
+                        <th>الحضور</th>
+                        <th>الفاينال</th>
+                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term2Body"></tbody>
@@ -305,14 +307,16 @@
         </div>
 
         <!-- الترم الثالث -->
-        <h2>الترم الثالث</h2>
+        <h2>نتيجة الترم الثالث</h2>
         <div class="table-container">
             <table id="term3Table">
                 <thead>
                     <tr class="term3-header">
-                        <th>الحضور</th>
+                        <th>المادة</th>
                         <th>الواجب</th>
-                        <th>فاينال</th>
+                        <th>الحضور</th>
+                        <th>الفاينال</th>
+                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term3Body"></tbody>
@@ -326,9 +330,10 @@
                 <thead>
                     <tr class="summary-header">
                         <th>الترم</th>
+                        <th>إجمالي الواجبات</th>
                         <th>إجمالي الحضور</th>
-                        <th>إجمالي الواجب</th>
                         <th>إجمالي الفاينال</th>
+                        <th>إجمالي الترم</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
@@ -466,9 +471,11 @@
 
             tbody.innerHTML = `
                 <tr>
+                    <td>المادة الأساسية</td>
                     <td>${assignment} / 150</td>
                     <td>${attendance} / 8</td>
                     <td>${finalExam} / 50</td>
+                    <td>${total} / 208</td>
                 </tr>
             `;
         }
@@ -478,35 +485,70 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1 },
-                { name: 'الترم الثاني', data: term2 },
-                { name: 'الترم الثالث', data: term3 }
+                { name: 'الترم الأول', data: term1, maxTotal: 394 },
+                { name: 'الترم الثاني', data: term2, maxTotal: 218 },
+                { name: 'الترم الثالث', data: term3, maxTotal: 197 }
             ];
 
-            let totalAssignments = 0;
             let totalAttendance = 0;
+            let totalAssignments = 0;
             let totalFinal = 0;
             let totalOverall = 0;
+            let maxAttendance = 0;
+            let maxAssignments = 0;
+            let maxFinal = 0;
+            let maxOverall = 0;
 
             terms.forEach(term => {
                 if (term.data.success && term.data.data) {
-                    const assignment = term.data.data["الواجب"] || 0;
-                    const attendance = term.data.data["الحضور"] || term.data.data["بحث"] || 0;
-                    const finalExam = term.data.data["الفاينال"] || 0;
-                    const termTotal = assignment + attendance + finalExam;
+                    const data = term.data.data;
+                    const termNum = term.data.term;
+                    
+                    let attendance, assignment, finalExam, termTotal;
+                    
+                    if (termNum === 1) {
+                        attendance = data["الحضور"] || 0;
+                        assignment = data["الواجب"] || 0;
+                        const research = data["البحث"] || 0;
+                        const midterm = data["الميدترم"] || 0;
+                        finalExam = data["الفاينال"] || 0;
+                        termTotal = attendance + assignment + research + midterm + finalExam;
+                        
+                        maxAttendance += 14;
+                        maxAssignments += 280;
+                        maxFinal += 50;
+                    } else if (termNum === 2) {
+                        attendance = data["الحضور"] || 0;
+                        assignment = data["الواجب"] || 0;
+                        finalExam = data["الفاينال"] || 0;
+                        termTotal = attendance + assignment + finalExam;
+                        
+                        maxAttendance += 8;
+                        maxAssignments += 160;
+                        maxFinal += 50;
+                    } else {
+                        attendance = data["الحضور"] || 0;
+                        assignment = data["الواجب"] || 0;
+                        finalExam = data["الفاينال"] || 0;
+                        termTotal = attendance + assignment + finalExam;
+                        
+                        maxAttendance += 7;
+                        maxAssignments += 140;
+                        maxFinal += 50;
+                    }
 
                     summaryHTML += `
                         <tr>
                             <td>${term.name}</td>
-                            <td>${assignment} / 150</td>
-                            <td>${attendance} / 8</td>
-                            <td>${finalExam} / 50</td>
-                            <td>${termTotal} / 208</td>
+                            <td>${attendance}</td>
+                            <td>${assignment}</td>
+                            <td>${finalExam}</td>
+                            <td>${termTotal} / ${term.maxTotal}</td>
                         </tr>
                     `;
 
-                    totalAssignments += assignment;
                     totalAttendance += attendance;
+                    totalAssignments += assignment;
                     totalFinal += finalExam;
                     totalOverall += termTotal;
                 } else {
@@ -519,14 +561,16 @@
                 }
             });
 
+            maxOverall = maxAttendance + maxAssignments + maxFinal + 10 + 40; // إضافة البحث والميدترم للترم الأول
+
             // إضافة صف الإجمالي
             summaryHTML += `
                 <tr style="background-color: #e8f5e8; font-weight: bold;">
                     <td>إجمالي السنة</td>
-                    <td>${totalAssignments} / 450</td>
-                    <td>${totalAttendance} / 24</td>
-                    <td>${totalFinal} / 150</td>
-                    <td>${totalOverall} / 624</td>
+                    <td>${totalAttendance} / ${maxAttendance}</td>
+                    <td>${totalAssignments} / ${maxAssignments}</td>
+                    <td>${totalFinal} / ${maxFinal}</td>
+                    <td>${totalOverall} / 809</td>
                 </tr>
             `;
 
@@ -535,6 +579,3 @@
     </script>
 </body>
 </html>
-
-
-
