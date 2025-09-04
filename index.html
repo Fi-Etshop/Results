@@ -701,9 +701,8 @@
             ];
 
             let totalAttendance = 0;
-            let totalAssignments = 0;
-            let totalResearchMidterm = 0;
-            let totalFinal = 0;
+            let totalAssignmentResearch = 0;
+            let totalMidtermFinal = 0;
             let totalOverall = 0;
 
             terms.forEach(term => {
@@ -711,22 +710,26 @@
                     const data = term.data.data;
                     const termNum = term.data.term;
                     
-                    let attendance, assignment, researchMidterm, finalExam, termTotal, percentage;
+                    let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
                     
                     if (termNum === 1) {
                         attendance = data["الحضور"] || 0;
-                        assignment = data["الواجب"] || 0;
+                        const assignment = data["الواجب"] || 0;
                         const research = data["البحث"] || 0;
                         const midterm = data["الميدترم"] || 0;
-                        researchMidterm = research + midterm;
-                        finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + researchMidterm + finalExam;
+                        const finalExam = data["الفاينال"] || 0;
+                        
+                        assignmentResearch = assignment + research;
+                        midtermFinal = midterm + finalExam;
+                        termTotal = attendance + assignmentResearch + midtermFinal;
                     } else {
                         attendance = data["الحضور"] || 0;
-                        assignment = data["الواجب"] || 0;
-                        researchMidterm = 0; // لا يوجد بحث أو ميدترم في الترم الثاني والثالث
-                        finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + finalExam;
+                        const assignment = data["الواجب"] || 0;
+                        const finalExam = data["الفاينال"] || 0;
+                        
+                        assignmentResearch = assignment; // لا يوجد بحث في الترم الثاني والثالث
+                        midtermFinal = finalExam; // لا يوجد ميدترم في الترم الثاني والثالث
+                        termTotal = attendance + assignmentResearch + midtermFinal;
                     }
 
                     percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -735,24 +738,22 @@
                         <tr>
                             <td>${term.name}</td>
                             <td class="grade-cell">${attendance}</td>
-                            <td class="grade-cell">${assignment}</td>
-                            <td class="grade-cell">${researchMidterm}</td>
-                            <td class="grade-cell">${finalExam}</td>
+                            <td class="grade-cell">${assignmentResearch}</td>
+                            <td class="grade-cell">${midtermFinal}</td>
                             <td class="grade-cell">${termTotal}</td>
                             <td class="grade-cell">${percentage}%</td>
                         </tr>
                     `;
 
                     totalAttendance += attendance;
-                    totalAssignments += assignment;
-                    totalResearchMidterm += researchMidterm;
-                    totalFinal += finalExam;
+                    totalAssignmentResearch += assignmentResearch;
+                    totalMidtermFinal += midtermFinal;
                     totalOverall += termTotal;
                 } else {
                     summaryHTML += `
                         <tr class="no-data-row">
                             <td>${term.name}</td>
-                            <td colspan="6">لا توجد نتائج</td>
+                            <td colspan="5">لا توجد نتائج</td>
                         </tr>
                     `;
                 }
@@ -765,9 +766,8 @@
                 <tr class="total-row">
                     <td>إجمالي السنة</td>
                     <td class="grade-cell">${totalAttendance}</td>
-                    <td class="grade-cell">${totalAssignments}</td>
-                    <td class="grade-cell">${totalResearchMidterm}</td>
-                    <td class="grade-cell">${totalFinal}</td>
+                    <td class="grade-cell">${totalAssignmentResearch}</td>
+                    <td class="grade-cell">${totalMidtermFinal}</td>
                     <td class="grade-cell">${totalOverall}</td>
                     <td class="grade-cell">${overallPercentage}%</td>
                 </tr>
