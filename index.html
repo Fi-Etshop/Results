@@ -10,12 +10,12 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
             margin: 0;
             padding: 10px;
             text-align: center;
             direction: rtl;
-            background-color: #f3eceb;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8ddd4 100%);
             min-height: 100vh;
         }
         
@@ -23,6 +23,7 @@
             margin: 20px 0;
             font-size: clamp(1.5rem, 4vw, 2.5rem);
             color: #752214;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         h2 {
@@ -31,6 +32,18 @@
             color: #752214;
             border-bottom: 2px solid #752214;
             padding-bottom: 10px;
+            position: relative;
+        }
+
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, #752214, #a03428);
         }
         
         .container {
@@ -39,16 +52,24 @@
             align-items: center;
             margin: 20px auto;
             max-width: 500px;
-            padding: 0 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
         .logo {
             width: 100%;
-            max-width: 400px;
+            max-width: 300px;
             height: auto;
             margin: 20px 0;
-            border: 2px solid #000;
-            border-radius: 10px;
+            border: 3px solid #752214;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
         
         label {
@@ -56,102 +77,142 @@
             font-weight: bold;
             color: #752214;
             margin-bottom: 10px;
+            display: block;
         }
         
         input {
             width: 100%;
             max-width: 300px;
-            padding: 12px;
+            padding: 15px;
             font-size: 16px;
             text-align: center;
-            border: 2px solid #752214;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #752214;
             background-color: white;
+            box-shadow: 0 0 10px rgba(117, 34, 20, 0.2);
         }
         
         button {
             width: 100%;
             max-width: 300px;
-            padding: 12px;
+            padding: 15px;
             font-size: 18px;
             font-weight: bold;
-            background-color: #752214;
+            background: linear-gradient(135deg, #752214, #a03428);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
+        button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover:before {
+            left: 100%;
+        }
+
         button:hover {
-            background-color: #5a1a10;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(117, 34, 20, 0.3);
         }
         
         button:active {
-            transform: scale(0.98);
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .results-section {
             width: 100%;
             max-width: 1200px;
             margin: 30px auto;
+            padding: 0 10px;
         }
         
         .table-container {
             width: 100%;
             overflow-x: auto;
             margin: 20px 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            background: white;
         }
         
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 400px;
+            min-width: 600px;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
         }
         
         th, td {
-            padding: 12px 8px;
+            padding: 15px 10px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
-            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            border-bottom: 1px solid #eee;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
         }
         
         th {
-            background-color: #752214;
             color: white;
             font-weight: bold;
             position: sticky;
             top: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         
         .term1-header {
-            background-color: #2e7d32;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
         }
         
         .term2-header {
-            background-color: #1976d2;
+            background: linear-gradient(135deg, #1976d2, #2196f3);
         }
         
         .term3-header {
-            background-color: #f57c00;
+            background: linear-gradient(135deg, #f57c00, #ff9800);
         }
         
         .summary-header {
-            background-color: #752214;
+            background: linear-gradient(135deg, #752214, #a03428);
         }
         
         td {
             background-color: white;
+            transition: background-color 0.3s ease;
         }
         
         tr:nth-child(even) td {
             background-color: #f9f9f9;
+        }
+
+        tr:hover td {
+            background-color: #f0f8ff;
         }
         
         .hidden {
@@ -162,10 +223,17 @@
             color: #d32f2f;
             font-weight: bold;
             margin: 15px 0;
-            padding: 10px;
-            background-color: #ffebee;
-            border-radius: 8px;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border-radius: 10px;
             border: 1px solid #d32f2f;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         
         .quote {
@@ -173,23 +241,87 @@
             color: #752214;
             margin: 30px 20px;
             font-weight: bold;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 25px;
+            background: linear-gradient(135deg, white, #fafafa);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-right: 5px solid #752214;
+            font-style: italic;
         }
         
         .student-info {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, white, #f8f9fa);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid #752214;
         }
         
         .student-info h3 {
             color: #752214;
             margin-top: 0;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .student-info p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .student-info strong {
+            color: #752214;
+        }
+        
+        /* Loading animation */
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #752214;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            color: #2e7d32;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            border-radius: 10px;
+            border: 1px solid #2e7d32;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grade-cell {
+            font-weight: bold;
+        }
+
+        .total-row {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9) !important;
+            font-weight: bold;
+            border-top: 2px solid #2e7d32;
+        }
+
+        .no-data-row {
+            color: #666;
+            font-style: italic;
+            background: #f5f5f5 !important;
         }
         
         /* Mobile specific styles */
@@ -199,69 +331,87 @@
             }
             
             .container {
-                padding: 0 10px;
+                margin: 10px;
+                padding: 15px;
             }
             
             th, td {
-                padding: 8px 4px;
-                font-size: 12px;
+                padding: 10px 6px;
+                font-size: 13px;
             }
             
             .logo {
-                max-width: 300px;
+                max-width: 250px;
             }
             
             .quote {
                 margin: 20px 10px;
-                padding: 15px;
-                font-size: 14px;
+                padding: 20px;
+                font-size: 16px;
             }
 
             .student-info {
                 margin: 15px 5px;
-                padding: 15px;
+                padding: 20px;
+            }
+
+            table {
+                min-width: 500px;
             }
         }
         
         /* Very small screens */
         @media (max-width: 480px) {
             th, td {
-                padding: 6px 2px;
-                font-size: 11px;
+                padding: 8px 4px;
+                font-size: 12px;
             }
             
             .table-container {
                 margin: 15px -5px;
             }
+
+            table {
+                min-width: 400px;
+            }
+
+            .container {
+                margin: 5px;
+                padding: 10px;
+            }
         }
-        
-        /* Loading animation */
-        .loading {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #752214;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            button, input {
+                display: none;
+            }
+            
+            .table-container {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
-    <img src="logo.png" alt="logo" class="logo">
-    <h1>نتائج السنة الأولى كاملة</h1>
+    <img src="logo.png" alt="شعار المعهد" class="logo" onerror="this.style.display='none'">
+    <h1>نتيجة السنة الأولى</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
-        <input type="text" id="nationalID" placeholder="أدخل الرقم القومي">
-        <button onclick="searchGrades()">البحث عن النتيجة</button>
+        <input type="text" id="nationalID" placeholder="أدخل الرقم القومي" maxlength="14">
+        <button onclick="searchGrades()" id="searchButton">البحث عن النتيجة</button>
         <div id="loadingSpinner" class="loading hidden"></div>
         <div id="errorMessage" class="error-message hidden"></div>
+        <div id="successMessage" class="success-message hidden"></div>
     </div>
 
     <!-- Student Info -->
@@ -281,6 +431,8 @@
                         <th>المادة</th>
                         <th>الواجب</th>
                         <th>الحضور</th>
+                        <th>البحث</th>
+                        <th>الميدترم</th>
                         <th>الفاينال</th>
                         <th>المجموع</th>
                     </tr>
@@ -332,8 +484,10 @@
                         <th>الترم</th>
                         <th>إجمالي الواجبات</th>
                         <th>إجمالي الحضور</th>
+                        <th>إجمالي البحث/الميدترم</th>
                         <th>إجمالي الفاينال</th>
                         <th>إجمالي الترم</th>
+                        <th>النسبة المئوية</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
@@ -353,28 +507,42 @@
             }
         });
 
+        // Input validation - only numbers
+        document.getElementById('nationalID').addEventListener('input', function(event) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
         async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
             const resultsSection = document.getElementById('resultsSection');
             const studentInfo = document.getElementById('studentInfo');
             const quote = document.getElementById('quote');
             const loadingSpinner = document.getElementById('loadingSpinner');
+            const searchButton = document.getElementById('searchButton');
 
             // Clear previous results
             errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
             resultsSection.classList.add('hidden');
             studentInfo.classList.add('hidden');
             quote.classList.add('hidden');
 
             if (!nationalID) {
-                errorMessage.textContent = "برجاء إدخال الرقم القومي";
-                errorMessage.classList.remove('hidden');
+                showError("برجاء إدخال الرقم القومي");
                 return;
             }
 
-            // Show loading spinner
+            if (nationalID.length !== 14) {
+                showError("الرقم القومي يجب أن يكون 14 رقم");
+                return;
+            }
+
+            // Show loading spinner and disable button
             loadingSpinner.classList.remove('hidden');
+            searchButton.disabled = true;
+            searchButton.textContent = 'جاري البحث...';
 
             try {
                 // جلب نتائج الثلاث ترمات
@@ -384,13 +552,14 @@
                     fetchTermResults(nationalID, 3)
                 ]);
 
-                // Hide loading spinner
+                // Hide loading spinner and enable button
                 loadingSpinner.classList.add('hidden');
+                searchButton.disabled = false;
+                searchButton.textContent = 'البحث عن النتيجة';
 
                 // التحقق من وجود بيانات لأي ترم
                 if (!term1Result.success && !term2Result.success && !term3Result.success) {
-                    errorMessage.textContent = "الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة";
-                    errorMessage.classList.remove('hidden');
+                    showError("الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة");
                     return;
                 }
 
@@ -403,28 +572,35 @@
                 }
 
                 // عرض نتائج كل ترم
-                displayTermResults(term1Result, 'term1Body');
-                displayTermResults(term2Result, 'term2Body');
-                displayTermResults(term3Result, 'term3Body');
+                displayTermResults(term1Result, 'term1Body', 1);
+                displayTermResults(term2Result, 'term2Body', 2);
+                displayTermResults(term3Result, 'term3Body', 3);
 
                 // عرض الملخص
                 displaySummary(term1Result, term2Result, term3Result);
 
                 resultsSection.classList.remove('hidden');
                 quote.classList.remove('hidden');
+                
+                showSuccess("تم العثور على النتائج بنجاح!");
+
+                // Scroll to results
+                setTimeout(() => {
+                    studentInfo.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
 
             } catch (error) {
                 loadingSpinner.classList.add('hidden');
-                errorMessage.textContent = "حدث خطأ في الاتصال. برجاء المحاولة مرة أخرى";
-                errorMessage.classList.remove('hidden');
+                searchButton.disabled = false;
+                searchButton.textContent = 'البحث عن النتيجة';
+                showError("حدث خطأ في الاتصال. برجاء المحاولة مرة أخرى");
                 console.error('Error:', error);
             }
         }
 
         async function fetchTermResults(nationalID, termNumber) {
             try {
-                // استخدام نفس API الأصلي - قد تحتاج لتعديل الـ endpoint حسب هيكل الـ API
-                // إذا كان الـ API يدعم تحديد الترم، استخدم معامل term
+                // استخدام نفس API الأصلي
                 const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}?term=${termNumber}`);
                 
                 if (response.ok) {
@@ -440,8 +616,8 @@
                     if (response.ok) {
                         const data = await response.json();
                         // إذا كانت البيانات تحتوي على معلومات الترم المطلوب
-                        if (data[`term${termNumber}`] || data[`ترم${termNumber}`]) {
-                            return { success: true, data: data[`term${termNumber}`] || data[`ترم${termNumber}`], term: termNumber };
+                        if (data[`term${termNumber}`]) {
+                            return { success: true, data: data[`term${termNumber}`], term: termNumber };
                         }
                         // إذا كان الترم الثاني هو المطلوب والـ API الحالي يعطي بيانات الترم الثاني
                         if (termNumber === 2) {
@@ -455,29 +631,54 @@
             }
         }
 
-        function displayTermResults(termResult, bodyId) {
+        function displayTermResults(termResult, bodyId, termNumber) {
             const tbody = document.getElementById(bodyId);
             
             if (!termResult.success || !termResult.data) {
-                tbody.innerHTML = '<tr><td colspan="5">لا توجد نتائج متاحة لهذا الترم</td></tr>';
+                tbody.innerHTML = `<tr class="no-data-row"><td colspan="${termNumber === 1 ? 7 : 5}">لا توجد نتائج متاحة لهذا الترم</td></tr>`;
                 return;
             }
 
             const data = termResult.data;
-            const assignment = data["الواجب"] || 0;
-            const attendance = data["الحضور"] || data["بحث"] || 0;
-            const finalExam = data["الفاينال"] || 0;
-            const total = assignment + attendance + finalExam;
+            let html = '';
 
-            tbody.innerHTML = `
-                <tr>
-                    <td>المادة الأساسية</td>
-                    <td>${assignment} / 150</td>
-                    <td>${attendance} / 8</td>
-                    <td>${finalExam} / 50</td>
-                    <td>${total} / 208</td>
-                </tr>
-            `;
+            if (termNumber === 1) {
+                const assignment = data["الواجب"] || 0;
+                const attendance = data["الحضور"] || 0;
+                const research = data["البحث"] || 0;
+                const midterm = data["الميدترم"] || 0;
+                const finalExam = data["الفاينال"] || 0;
+                const total = assignment + attendance + research + midterm + finalExam;
+
+                html = `
+                    <tr>
+                        <td>المادة الأساسية</td>
+                        <td class="grade-cell">${assignment}</td>
+                        <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${research}</td>
+                        <td class="grade-cell">${midterm}</td>
+                        <td class="grade-cell">${finalExam}</td>
+                        <td class="grade-cell">${total}</td>
+                    </tr>
+                `;
+            } else {
+                const assignment = data["الواجب"] || 0;
+                const attendance = data["الحضور"] || 0;
+                const finalExam = data["الفاينال"] || 0;
+                const total = assignment + attendance + finalExam;
+
+                html = `
+                    <tr>
+                        <td>المادة الأساسية</td>
+                        <td class="grade-cell">${assignment}</td>
+                        <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${finalExam}</td>
+                        <td class="grade-cell">${total}</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = html;
         }
 
         function displaySummary(term1, term2, term3) {
@@ -485,96 +686,102 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 394 },
-                { name: 'الترم الثاني', data: term2, maxTotal: 218 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 197 }
+                { name: 'الترم الأول', data: term1, maxTotal: 750 },
+                { name: 'الترم الثاني', data: term2, maxTotal: 220 },
+                { name: 'الترم الثالث', data: term3, maxTotal: 300 }
             ];
 
             let totalAttendance = 0;
             let totalAssignments = 0;
+            let totalResearchMidterm = 0;
             let totalFinal = 0;
             let totalOverall = 0;
-            let maxAttendance = 0;
-            let maxAssignments = 0;
-            let maxFinal = 0;
-            let maxOverall = 0;
 
             terms.forEach(term => {
                 if (term.data.success && term.data.data) {
                     const data = term.data.data;
                     const termNum = term.data.term;
                     
-                    let attendance, assignment, finalExam, termTotal;
+                    let attendance, assignment, researchMidterm, finalExam, termTotal, percentage;
                     
                     if (termNum === 1) {
                         attendance = data["الحضور"] || 0;
                         assignment = data["الواجب"] || 0;
                         const research = data["البحث"] || 0;
                         const midterm = data["الميدترم"] || 0;
+                        researchMidterm = research + midterm;
                         finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + research + midterm + finalExam;
-                        
-                        maxAttendance += 14;
-                        maxAssignments += 280;
-                        maxFinal += 50;
-                    } else if (termNum === 2) {
-                        attendance = data["الحضور"] || 0;
-                        assignment = data["الواجب"] || 0;
-                        finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + finalExam;
-                        
-                        maxAttendance += 8;
-                        maxAssignments += 160;
-                        maxFinal += 50;
+                        termTotal = attendance + assignment + researchMidterm + finalExam;
                     } else {
                         attendance = data["الحضور"] || 0;
                         assignment = data["الواجب"] || 0;
+                        researchMidterm = 0; // لا يوجد بحث أو ميدترم في الترم الثاني والثالث
                         finalExam = data["الفاينال"] || 0;
                         termTotal = attendance + assignment + finalExam;
-                        
-                        maxAttendance += 7;
-                        maxAssignments += 140;
-                        maxFinal += 50;
                     }
+
+                    percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
 
                     summaryHTML += `
                         <tr>
                             <td>${term.name}</td>
-                            <td>${attendance}</td>
-                            <td>${assignment}</td>
-                            <td>${finalExam}</td>
-                            <td>${termTotal} / ${term.maxTotal}</td>
+                            <td class="grade-cell">${assignment}</td>
+                            <td class="grade-cell">${attendance}</td>
+                            <td class="grade-cell">${researchMidterm}</td>
+                            <td class="grade-cell">${finalExam}</td>
+                            <td class="grade-cell">${termTotal}</td>
+                            <td class="grade-cell">${percentage}%</td>
                         </tr>
                     `;
 
                     totalAttendance += attendance;
                     totalAssignments += assignment;
+                    totalResearchMidterm += researchMidterm;
                     totalFinal += finalExam;
                     totalOverall += termTotal;
                 } else {
                     summaryHTML += `
-                        <tr>
+                        <tr class="no-data-row">
                             <td>${term.name}</td>
-                            <td colspan="4">لا توجد نتائج</td>
+                            <td colspan="6">لا توجد نتائج</td>
                         </tr>
                     `;
                 }
             });
 
-            maxOverall = maxAttendance + maxAssignments + maxFinal + 10 + 40; // إضافة البحث والميدترم للترم الأول
+            const overallPercentage = ((totalOverall / 1270) * 100).toFixed(1); // إجمالي الدرجات للسنة
 
             // إضافة صف الإجمالي
             summaryHTML += `
-                <tr style="background-color: #e8f5e8; font-weight: bold;">
+                <tr class="total-row">
                     <td>إجمالي السنة</td>
-                    <td>${totalAttendance} / ${maxAttendance}</td>
-                    <td>${totalAssignments} / ${maxAssignments}</td>
-                    <td>${totalFinal} / ${maxFinal}</td>
-                    <td>${totalOverall} / 809</td>
+                    <td class="grade-cell">${totalAssignments}</td>
+                    <td class="grade-cell">${totalAttendance}</td>
+                    <td class="grade-cell">${totalResearchMidterm}</td>
+                    <td class="grade-cell">${totalFinal}</td>
+                    <td class="grade-cell">${totalOverall}</td>
+                    <td class="grade-cell">${overallPercentage}%</td>
                 </tr>
             `;
 
             summaryBody.innerHTML = summaryHTML;
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 3000);
         }
     </script>
 </body>
