@@ -428,13 +428,11 @@
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
-                        <th>المادة</th>
                         <th>الحضور</th>
                         <th>الواجب</th>
                         <th>البحث</th>
                         <th>الميدترم</th>
                         <th>الفاينال</th>
-                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term1Body"></tbody>
@@ -447,11 +445,9 @@
             <table id="term2Table">
                 <thead>
                     <tr class="term2-header">
-                        <th>المادة</th>
                         <th>الحضور</th>
                         <th>الواجب</th>
                         <th>الفاينال</th>
-                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term2Body"></tbody>
@@ -464,11 +460,9 @@
             <table id="term3Table">
                 <thead>
                     <tr class="term3-header">
-                        <th>المادة</th>
                         <th>الحضور</th>
                         <th>الواجب</th>
                         <th>الفاينال</th>
-                        <th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="term3Body"></tbody>
@@ -652,28 +646,23 @@
 
                 html = `
                     <tr>
-                        <td>المادة الأساسية</td>
                         <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${attendance}</td>
                         <td class="grade-cell">${research}</td>
                         <td class="grade-cell">${midterm}</td>
                         <td class="grade-cell">${finalExam}</td>
-                        <td class="grade-cell">${total}</td>
                     </tr>
                 `;
             } else {
                 const assignment = data["الواجب"] || 0;
                 const attendance = data["الحضور"] || 0;
                 const finalExam = data["الفاينال"] || 0;
-                const total = assignment + attendance + finalExam;
 
                 html = `
                     <tr>
-                        <td>المادة الأساسية</td>
                         <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${attendance}</td>
                         <td class="grade-cell">${finalExam}</td>
-                        <td class="grade-cell">${total}</td>
                     </tr>
                 `;
             }
@@ -786,6 +775,7 @@
     </script>
 </body>
 </html>
+
 
 
 
