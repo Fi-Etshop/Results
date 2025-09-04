@@ -254,7 +254,7 @@
 </head>
 <body>
     <img src="logo.png" alt="logo" class="logo">
-    <h1>نتائج السنة الأولى كاملة</h1>
+    <h1>نتيجة السنة الأولى</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
@@ -266,7 +266,7 @@
 
     <!-- Student Info -->
     <div id="studentInfo" class="student-info hidden">
-        <h3>معلومات الطالب</h3>
+        <h3>معلومات الملتحق</h3>
         <p><strong>الاسم:</strong> <span id="studentName"></span></p>
         <p><strong>الكود:</strong> <span id="studentCode"></span></p>
     </div>
@@ -278,11 +278,11 @@
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
-                        <th>المادة</th>
-                        <th>الواجب</th>
                         <th>الحضور</th>
-                        <th>الفاينال</th>
-                        <th>المجموع</th>
+                        <th>الواجب</th>
+                        <th>البحث</th>
+                        <th>ميدترم</th>
+                        <th>فاينال</th>
                     </tr>
                 </thead>
                 <tbody id="term1Body"></tbody>
@@ -295,11 +295,9 @@
             <table id="term2Table">
                 <thead>
                     <tr class="term2-header">
-                        <th>المادة</th>
-                        <th>الواجب</th>
                         <th>الحضور</th>
-                        <th>الفاينال</th>
-                        <th>المجموع</th>
+                        <th>الواجب</th>
+                        <th>فاينال</th>
                     </tr>
                 </thead>
                 <tbody id="term2Body"></tbody>
@@ -312,11 +310,9 @@
             <table id="term3Table">
                 <thead>
                     <tr class="term3-header">
-                        <th>المادة</th>
-                        <th>الواجب</th>
                         <th>الحضور</th>
-                        <th>الفاينال</th>
-                        <th>المجموع</th>
+                        <th>الواجب</th>
+                        <th>فاينال</th>
                     </tr>
                 </thead>
                 <tbody id="term3Body"></tbody>
@@ -330,10 +326,9 @@
                 <thead>
                     <tr class="summary-header">
                         <th>الترم</th>
-                        <th>إجمالي الواجبات</th>
                         <th>إجمالي الحضور</th>
+                        <th>إجمالي الواجب</th>
                         <th>إجمالي الفاينال</th>
-                        <th>إجمالي الترم</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
@@ -475,7 +470,6 @@
                     <td>${assignment} / 150</td>
                     <td>${attendance} / 8</td>
                     <td>${finalExam} / 50</td>
-                    <td>${total} / 208</td>
                 </tr>
             `;
         }
@@ -542,3 +536,4 @@
     </script>
 </body>
 </html>
+
