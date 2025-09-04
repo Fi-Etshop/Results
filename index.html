@@ -720,7 +720,7 @@
                         
                         assignmentResearch = assignment + research;
                         midtermFinal = midterm + finalExam;
-                        termTotal = attendance + assignmentResearch + midtermFinal;
+                        termTotal = assignmentResearch + midtermFinal;
                     } else {
                         attendance = data["الحضور"] || 0;
                         const assignment = data["الواجب"] || 0;
@@ -728,7 +728,7 @@
                         
                         assignmentResearch = assignment; // لا يوجد بحث في الترم الثاني والثالث
                         midtermFinal = finalExam; // لا يوجد ميدترم في الترم الثاني والثالث
-                        termTotal = attendance + assignmentResearch + midtermFinal;
+                        termTotal = assignmentResearch + midtermFinal;
                     }
 
                     percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -794,4 +794,5 @@
     </script>
 </body>
 </html>
+
 
