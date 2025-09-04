@@ -637,8 +637,8 @@
             let html = '';
 
             if (termNumber === 1) {
-                const assignment = data["الواجب"] || 0;
                 const attendance = data["الحضور"] || 0;
+                const assignment = data["الواجب"] || 0;
                 const research = data["البحث"] || 0;
                 const midterm = data["الميدترم"] || 0;
                 const finalExam = data["الفاينال"] || 0;
@@ -646,22 +646,22 @@
 
                 html = `
                     <tr>
-                        <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${research}</td>
                         <td class="grade-cell">${midterm}</td>
                         <td class="grade-cell">${finalExam}</td>
                     </tr>
                 `;
             } else {
-                const assignment = data["الواجب"] || 0;
                 const attendance = data["الحضور"] || 0;
+                const assignment = data["الواجب"] || 0;
                 const finalExam = data["الفاينال"] || 0;
 
                 html = `
                     <tr>
-                        <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${assignment}</td>
                         <td class="grade-cell">${finalExam}</td>
                     </tr>
                 `;
@@ -675,15 +675,14 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 400 },
+                { name: 'الترم الأول', data: term1, maxTotal: 380 },
                 { name: 'الترم الثاني', data: term2, maxTotal: 200 },
                 { name: 'الترم الثالث', data: term3, maxTotal: 200 }
             ];
 
             let totalAttendance = 0;
-            let totalAssignments = 0;
-            let totalResearchMidterm = 0;
-            let totalFinal = 0;
+            let totalAssignmentsResearch = 0;
+            let totalMidtermFinal = 0;
             let totalOverall = 0;
 
             terms.forEach(term => {
@@ -691,22 +690,26 @@
                     const data = term.data.data;
                     const termNum = term.data.term;
                     
-                    let attendance, assignment, researchMidterm, finalExam, termTotal, percentage;
+                    let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
                     
                     if (termNum === 1) {
                         attendance = data["الحضور"] || 0;
-                        assignment = data["الواجب"] || 0;
+                        const assignment = data["الواجب"] || 0;
                         const research = data["البحث"] || 0;
+                        assignmentResearch = assignment + research;
                         const midterm = data["الميدترم"] || 0;
-                        researchMidterm = research + midterm;
-                        finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + researchMidterm + finalExam;
+                        const finalExam = data["الفاينال"] || 0;
+                        midtermFinal = midterm + final;
+                        termTotal = assignmentResearch + midtermFinal;
                     } else {
                         attendance = data["الحضور"] || 0;
-                        assignment = data["الواجب"] || 0;
-                        researchMidterm = 0; // لا يوجد بحث أو ميدترم في الترم الثاني والثالث
-                        finalExam = data["الفاينال"] || 0;
-                        termTotal = attendance + assignment + finalExam;
+                        const assignment = data["الواجب"] || 0;
+                        const research = data["البحث"] || 0;
+                        assignmentResearch = assignment + research;
+                        const midterm = data["الميدترم"] || 0;
+                        const finalExam = data["الفاينال"] || 0;
+                        midtermFinal = midterm + final;
+                        termTotal = assignmentResearch + midtermFinal;
                     }
 
                     percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -714,19 +717,17 @@
                     summaryHTML += `
                         <tr>
                             <td>${term.name}</td>
-                            <td class="grade-cell">${assignment}</td>
                             <td class="grade-cell">${attendance}</td>
-                            <td class="grade-cell">${researchMidterm}</td>
-                            <td class="grade-cell">${finalExam}</td>
+                            <td class="grade-cell">${assignmentResearch}</td>
+                            <td class="grade-cell">${midtermFinal}</td>
                             <td class="grade-cell">${termTotal}</td>
                             <td class="grade-cell">${percentage}%</td>
                         </tr>
                     `;
 
                     totalAttendance += attendance;
-                    totalAssignments += assignment;
-                    totalResearchMidterm += researchMidterm;
-                    totalFinal += finalExam;
+                    totalAssignments += assignmentResearch;
+                    totalFinal += midtermFinal;
                     totalOverall += termTotal;
                 } else {
                     summaryHTML += `
@@ -744,9 +745,8 @@
             summaryHTML += `
                 <tr class="total-row">
                     <td>إجمالي السنة</td>
-                    <td class="grade-cell">${totalAssignments}</td>
                     <td class="grade-cell">${totalAttendance}</td>
-                    <td class="grade-cell">${totalResearchMidterm}</td>
+                    <td class="grade-cell">${totalAssignments}</td>
                     <td class="grade-cell">${totalFinal}</td>
                     <td class="grade-cell">${totalOverall}</td>
                     <td class="grade-cell">${overallPercentage}%</td>
@@ -775,6 +775,7 @@
     </script>
 </body>
 </html>
+
 
 
 
