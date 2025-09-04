@@ -594,34 +594,54 @@
 
         async function fetchTermResults(nationalID, termNumber) {
             try {
-                // استخدام نفس API الأصلي
-                const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}?term=${termNumber}`);
+                // محاولة الاتصال بـ API الأصلي أولاً
+                const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}?term=${termNumber}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    timeout: 10000 // 10 seconds timeout
+                });
                 
                 if (response.ok) {
                     const data = await response.json();
                     return { success: true, data: data, term: termNumber };
+                } else if (response.status === 404) {
+                    return { success: false, term: termNumber, error: 'not_found' };
                 } else {
-                    return { success: false, term: termNumber };
+                    throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
-                // إذا فشل طلب ترم معين، جرب بدون معامل الترم
+                console.log(`Error fetching term ${termNumber}:`, error);
+                
+                // محاولة بديلة بدون معامل الترم
                 try {
-                    const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        // إذا كانت البيانات تحتوي على معلومات الترم المطلوب
+                    const fallbackResponse = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        timeout: 10000
+                    });
+                    
+                    if (fallbackResponse.ok) {
+                        const data = await fallbackResponse.json();
+                        
+                        // البحث عن بيانات الترم المحدد في الاستجابة
                         if (data[`term${termNumber}`]) {
                             return { success: true, data: data[`term${termNumber}`], term: termNumber };
-                        }
-                        // إذا كان الترم الثاني هو المطلوب والـ API الحالي يعطي بيانات الترم الثاني
-                        if (termNumber === 2) {
+                        } else if (termNumber === 1 && data) {
+                            // إذا كان الترم الأول والبيانات متاحة مباشرة
                             return { success: true, data: data, term: termNumber };
                         }
                     }
-                    return { success: false, term: termNumber };
                 } catch (fallbackError) {
-                    return { success: false, term: termNumber };
+                    console.log('Fallback request also failed:', fallbackError);
                 }
+                
+                return { success: false, term: termNumber, error: 'connection_failed' };
             }
         }
 
@@ -629,7 +649,8 @@
             const tbody = document.getElementById(bodyId);
             
             if (!termResult.success || !termResult.data) {
-                tbody.innerHTML = `<tr class="no-data-row"><td colspan="${termNumber === 1 ? 7 : 5}">لا توجد نتائج متاحة لهذا الترم</td></tr>`;
+                const colspan = termNumber === 1 ? 5 : 3;
+                tbody.innerHTML = `<tr class="no-data-row"><td colspan="${colspan}">لا توجد نتائج متاحة لهذا الترم</td></tr>`;
                 return;
             }
 
@@ -642,7 +663,6 @@
                 const research = data["البحث"] || 0;
                 const midterm = data["الميدترم"] || 0;
                 const finalExam = data["الفاينال"] || 0;
-                const total = assignment + attendance + research + midterm + finalExam;
 
                 html = `
                     <tr>
@@ -681,8 +701,9 @@
             ];
 
             let totalAttendance = 0;
-            let totalAssignmentsResearch = 0;
-            let totalMidtermFinal = 0;
+            let totalAssignments = 0;
+            let totalResearchMidterm = 0;
+            let totalFinal = 0;
             let totalOverall = 0;
 
             terms.forEach(term => {
@@ -690,26 +711,22 @@
                     const data = term.data.data;
                     const termNum = term.data.term;
                     
-                    let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
+                    let attendance, assignment, researchMidterm, finalExam, termTotal, percentage;
                     
                     if (termNum === 1) {
                         attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
+                        assignment = data["الواجب"] || 0;
                         const research = data["البحث"] || 0;
-                        assignmentResearch = assignment + research;
                         const midterm = data["الميدترم"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        midtermFinal = midterm + final;
-                        termTotal = assignmentResearch + midtermFinal;
+                        researchMidterm = research + midterm;
+                        finalExam = data["الفاينال"] || 0;
+                        termTotal = attendance + assignment + researchMidterm + finalExam;
                     } else {
                         attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
-                        const research = data["البحث"] || 0;
-                        assignmentResearch = assignment + research;
-                        const midterm = data["الميدترم"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        midtermFinal = midterm + final;
-                        termTotal = assignmentResearch + midtermFinal;
+                        assignment = data["الواجب"] || 0;
+                        researchMidterm = 0; // لا يوجد بحث أو ميدترم في الترم الثاني والثالث
+                        finalExam = data["الفاينال"] || 0;
+                        termTotal = attendance + assignment + finalExam;
                     }
 
                     percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -718,16 +735,18 @@
                         <tr>
                             <td>${term.name}</td>
                             <td class="grade-cell">${attendance}</td>
-                            <td class="grade-cell">${assignmentResearch}</td>
-                            <td class="grade-cell">${midtermFinal}</td>
+                            <td class="grade-cell">${assignment}</td>
+                            <td class="grade-cell">${researchMidterm}</td>
+                            <td class="grade-cell">${finalExam}</td>
                             <td class="grade-cell">${termTotal}</td>
                             <td class="grade-cell">${percentage}%</td>
                         </tr>
                     `;
 
                     totalAttendance += attendance;
-                    totalAssignments += assignmentResearch;
-                    totalFinal += midtermFinal;
+                    totalAssignments += assignment;
+                    totalResearchMidterm += researchMidterm;
+                    totalFinal += finalExam;
                     totalOverall += termTotal;
                 } else {
                     summaryHTML += `
@@ -739,7 +758,7 @@
                 }
             });
 
-            const overallPercentage = ((totalOverall / 1270) * 100).toFixed(1); // إجمالي الدرجات للسنة
+            const overallPercentage = ((totalOverall / 780) * 100).toFixed(1); // إجمالي الدرجات للسنة
 
             // إضافة صف الإجمالي
             summaryHTML += `
@@ -747,6 +766,7 @@
                     <td>إجمالي السنة</td>
                     <td class="grade-cell">${totalAttendance}</td>
                     <td class="grade-cell">${totalAssignments}</td>
+                    <td class="grade-cell">${totalResearchMidterm}</td>
                     <td class="grade-cell">${totalFinal}</td>
                     <td class="grade-cell">${totalOverall}</td>
                     <td class="grade-cell">${overallPercentage}%</td>
@@ -775,8 +795,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
