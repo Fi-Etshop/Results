@@ -696,7 +696,7 @@
             const terms = [
                 { name: 'الترم الأول', data: term1, maxTotal: 380 },
                 { name: 'الترم الثاني', data: term2, maxTotal: 200 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 200 }
+                { name: 'الترم الثالث', data: term3, maxTotal: 190 }
             ];
 
             let totalAttendance = 0;
@@ -758,7 +758,7 @@
                 }
             });
 
-            const overallPercentage = ((totalOverall / 780) * 100).toFixed(1); // إجمالي الدرجات للسنة
+            const overallPercentage = ((totalOverall / 770) * 100).toFixed(1); // إجمالي الدرجات للسنة
 
             // إضافة صف الإجمالي
             summaryHTML += `
@@ -794,5 +794,6 @@
     </script>
 </body>
 </html>
+
 
 
