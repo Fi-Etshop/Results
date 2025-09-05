@@ -165,7 +165,7 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 600px;
+            min-width: 700px;
             background-color: white;
             border-radius: 15px;
             overflow: hidden;
@@ -184,6 +184,18 @@
             position: sticky;
             top: 0;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .grade-header {
+            font-size: 0.9em;
+            line-height: 1.2;
+        }
+
+        .max-grade {
+            display: block;
+            font-size: 0.8em;
+            opacity: 0.9;
+            margin-top: 2px;
         }
         
         .term1-header {
@@ -310,6 +322,17 @@
 
         .grade-cell {
             font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .grade-fraction {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .grade-value {
+            color: #2e7d32;
+            font-weight: bold;
         }
 
         .total-row {
@@ -322,6 +345,21 @@
             color: #666;
             font-style: italic;
             background: #f5f5f5 !important;
+        }
+
+        .percentage-good {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .percentage-warning {
+            color: #f57c00;
+            font-weight: bold;
+        }
+
+        .percentage-danger {
+            color: #d32f2f;
+            font-weight: bold;
         }
         
         /* Mobile specific styles */
@@ -356,7 +394,11 @@
             }
 
             table {
-                min-width: 500px;
+                min-width: 600px;
+            }
+
+            .max-grade {
+                font-size: 0.7em;
             }
         }
         
@@ -372,12 +414,16 @@
             }
 
             table {
-                min-width: 400px;
+                min-width: 500px;
             }
 
             .container {
                 margin: 5px;
                 padding: 10px;
+            }
+
+            .max-grade {
+                font-size: 0.65em;
             }
         }
 
@@ -428,11 +474,11 @@
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
-                        <th>الحضور</th>
-                        <th>الواجب</th>
-                        <th>البحث</th>
-                        <th>الميدترم</th>
-                        <th>الفاينال</th>
+                        <th class="grade-header">الحضور<span class="max-grade">من 14</span></th>
+                        <th class="grade-header">الواجب<span class="max-grade">من 280</span></th>
+                        <th class="grade-header">البحث<span class="max-grade">من 10</span></th>
+                        <th class="grade-header">الميدترم<span class="max-grade">من 40</span></th>
+                        <th class="grade-header">الفاينال<span class="max-grade">من 50</span></th>
                     </tr>
                 </thead>
                 <tbody id="term1Body"></tbody>
@@ -445,9 +491,9 @@
             <table id="term2Table">
                 <thead>
                     <tr class="term2-header">
-                        <th>الحضور</th>
-                        <th>الواجب</th>
-                        <th>الفاينال</th>
+                        <th class="grade-header">الحضور<span class="max-grade">من 8</span></th>
+                        <th class="grade-header">الواجب<span class="max-grade">من 150</span></th>
+                        <th class="grade-header">الفاينال<span class="max-grade">من 50</span></th>
                     </tr>
                 </thead>
                 <tbody id="term2Body"></tbody>
@@ -460,9 +506,9 @@
             <table id="term3Table">
                 <thead>
                     <tr class="term3-header">
-                        <th>الحضور</th>
-                        <th>الواجب</th>
-                        <th>الفاينال</th>
+                        <th class="grade-header">الحضور<span class="max-grade">من 7</span></th>
+                        <th class="grade-header">الواجب<span class="max-grade">من 140</span></th>
+                        <th class="grade-header">الفاينال<span class="max-grade">من 50</span></th>
                     </tr>
                 </thead>
                 <tbody id="term3Body"></tbody>
@@ -504,6 +550,30 @@
         document.getElementById('nationalID').addEventListener('input', function(event) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
+
+        // Maximum grades configuration
+        const maxGrades = {
+            term1: {
+                attendance: 14,
+                assignment: 280,
+                research: 10,
+                midterm: 40,
+                final: 50,
+                total: 394
+            },
+            term2: {
+                attendance: 8,
+                assignment: 150,
+                final: 50,
+                total: 208
+            },
+            term3: {
+                attendance: 7,
+                assignment: 140,
+                final: 50,
+                total: 197
+            }
+        };
 
         async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
@@ -644,6 +714,21 @@
             }
         }
 
+        function formatGradeWithMax(value, maxValue) {
+            const percentage = maxValue > 0 ? ((value / maxValue) * 100) : 0;
+            let cssClass = 'grade-value';
+            
+            if (percentage >= 80) {
+                cssClass += ' percentage-good';
+            } else if (percentage >= 60) {
+                cssClass += ' percentage-warning';
+            } else {
+                cssClass += ' percentage-danger';
+            }
+            
+            return `<span class="${cssClass}">${value}</span><span class="grade-fraction">/${maxValue}</span>`;
+        }
+
         function displayTermResults(termResult, bodyId, termNumber) {
             const tbody = document.getElementById(bodyId);
             
@@ -654,6 +739,7 @@
             }
 
             const data = termResult.data;
+            const termConfig = maxGrades[`term${termNumber}`];
             let html = '';
 
             if (termNumber === 1) {
@@ -665,11 +751,11 @@
 
                 html = `
                     <tr>
-                        <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${assignment}</td>
-                        <td class="grade-cell">${research}</td>
-                        <td class="grade-cell">${midterm}</td>
-                        <td class="grade-cell">${finalExam}</td>
+                        <td class="grade-cell">${formatGradeWithMax(attendance, termConfig.attendance)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(assignment, termConfig.assignment)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(research, termConfig.research)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(midterm, termConfig.midterm)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(finalExam, termConfig.final)}</td>
                     </tr>
                 `;
             } else {
@@ -679,9 +765,9 @@
 
                 html = `
                     <tr>
-                        <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${assignment}</td>
-                        <td class="grade-cell">${finalExam}</td>
+                        <td class="grade-cell">${formatGradeWithMax(attendance, termConfig.attendance)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(assignment, termConfig.assignment)}</td>
+                        <td class="grade-cell">${formatGradeWithMax(finalExam, termConfig.final)}</td>
                     </tr>
                 `;
             }
@@ -694,22 +780,28 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 380 },
-                { name: 'الترم الثاني', data: term2, maxTotal: 200 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 190 }
+                { name: 'الترم الأول', data: term1, config: maxGrades.term1 },
+                { name: 'الترم الثاني', data: term2, config: maxGrades.term2 },
+                { name: 'الترم الثالث', data: term3, config: maxGrades.term3 }
             ];
 
             let totalAttendance = 0;
             let totalAssignmentResearch = 0;
             let totalMidtermFinal = 0;
             let totalOverall = 0;
+            let maxTotalAttendance = 0;
+            let maxTotalAssignmentResearch = 0;
+            let maxTotalMidtermFinal = 0;
+            let maxTotalOverall = 0;
 
             terms.forEach(term => {
                 if (term.data.success && term.data.data) {
                     const data = term.data.data;
                     const termNum = term.data.term;
+                    const config = term.config;
                     
                     let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
+                    let maxAttendance, maxAssignmentResearch, maxMidtermFinal;
                     
                     if (termNum === 1) {
                         attendance = data["الحضور"] || 0;
@@ -720,80 +812,28 @@
                         
                         assignmentResearch = assignment + research;
                         midtermFinal = midterm + finalExam;
-                        termTotal = assignmentResearch + midtermFinal;
+                        termTotal = attendance + assignmentResearch + midtermFinal;
+                        
+                        maxAttendance = config.attendance;
+                        maxAssignmentResearch = config.assignment + config.research;
+                        maxMidtermFinal = config.midterm + config.final;
                     } else {
                         attendance = data["الحضور"] || 0;
                         const assignment = data["الواجب"] || 0;
                         const finalExam = data["الفاينال"] || 0;
                         
-                        assignmentResearch = assignment; // لا يوجد بحث في الترم الثاني والثالث
-                        midtermFinal = finalExam; // لا يوجد ميدترم في الترم الثاني والثالث
-                        termTotal = assignmentResearch + midtermFinal;
+                        assignmentResearch = assignment;
+                        midtermFinal = finalExam;
+                        termTotal = attendance + assignmentResearch + midtermFinal;
+                        
+                        maxAttendance = config.attendance;
+                        maxAssignmentResearch = config.assignment;
+                        maxMidtermFinal = config.final;
                     }
 
-                    percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
+                    percentage = ((termTotal / config.total) * 100).toFixed(1);
+                    let percentageClass = 'percentage-good';
+                    if (percentage < 80) percentageClass = 'percentage-warning';
+                    if (percentage < 60) percentageClass = 'percentage-danger';
 
-                    summaryHTML += `
-                        <tr>
-                            <td>${term.name}</td>
-                            <td class="grade-cell">${attendance}</td>
-                            <td class="grade-cell">${assignmentResearch}</td>
-                            <td class="grade-cell">${midtermFinal}</td>
-                            <td class="grade-cell">${termTotal}</td>
-                            <td class="grade-cell">${percentage}%</td>
-                        </tr>
-                    `;
-
-                    totalAttendance += attendance;
-                    totalAssignmentResearch += assignmentResearch;
-                    totalMidtermFinal += midtermFinal;
-                    totalOverall += termTotal;
-                } else {
-                    summaryHTML += `
-                        <tr class="no-data-row">
-                            <td>${term.name}</td>
-                            <td colspan="5">لا توجد نتائج</td>
-                        </tr>
-                    `;
-                }
-            });
-
-            const overallPercentage = ((totalOverall / 770) * 100).toFixed(1); // إجمالي الدرجات للسنة
-
-            // إضافة صف الإجمالي
-            summaryHTML += `
-                <tr class="total-row">
-                    <td>إجمالي السنة</td>
-                    <td class="grade-cell">${totalAttendance}</td>
-                    <td class="grade-cell">${totalAssignmentResearch}</td>
-                    <td class="grade-cell">${totalMidtermFinal}</td>
-                    <td class="grade-cell">${totalOverall}</td>
-                    <td class="grade-cell">${overallPercentage}%</td>
-                </tr>
-            `;
-
-            summaryBody.innerHTML = summaryHTML;
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-        }
-
-        function showSuccess(message) {
-            const successMessage = document.getElementById('successMessage');
-            successMessage.textContent = message;
-            successMessage.classList.remove('hidden');
-            
-            // Hide success message after 3 seconds
-            setTimeout(() => {
-                successMessage.classList.add('hidden');
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
-
-
-
+                    summary
