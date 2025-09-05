@@ -840,5 +840,53 @@
                         <tr>
                             <td>${term.name}</td>
                             <td class="grade-cell">${attendance}/${maxAttendance}</td>
-                            <td class="grade
+                            <td class="grade-cell">${assignmentResearch}/${maxAssignmentResearch}</td>
+                            <td class="grade-cell">${midtermFinal}/${maxMidtermFinal}</td>
+                            <td class="grade-cell">${termTotal}/${config.total}</td>
+                            <td class="grade-cell"><span class="${percentageClass}">${percentage}%</span></td>
+                        </tr>
+                    `;
 
+                    // إضافة للمجاميع الإجمالية
+                    totalAttendance += attendance;
+                    totalAssignmentResearch += assignmentResearch;
+                    totalMidtermFinal += midtermFinal;
+                    totalOverall += termTotal;
+                    maxTotalAttendance += maxAttendance;
+                    maxTotalAssignmentResearch += maxAssignmentResearch;
+                    maxTotalMidtermFinal += maxMidtermFinal;
+                    maxTotalOverall += config.total;
+                } else {
+                    summaryHTML += `
+                        <tr>
+                            <td>${term.name}</td>
+                            <td class="grade-cell no-data-row" colspan="5">لا توجد نتائج متاحة</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // إضافة صف الإجمالي
+            if (maxTotalOverall > 0) {
+                const overallPercentage = ((totalOverall / maxTotalOverall) * 100).toFixed(1);
+                let overallPercentageClass = 'percentage-good';
+                if (overallPercentage < 80) overallPercentageClass = 'percentage-warning';
+                if (overallPercentage < 60) overallPercentageClass = 'percentage-danger';
+
+                summaryHTML += `
+                    <tr style="background-color: #f0f8ff; font-weight: bold; border-top: 2px solid #667eea;">
+                        <td>الإجمالي العام</td>
+                        <td class="grade-cell">${totalAttendance}/${maxTotalAttendance}</td>
+                        <td class="grade-cell">${totalAssignmentResearch}/${maxTotalAssignmentResearch}</td>
+                        <td class="grade-cell">${totalMidtermFinal}/${maxTotalMidtermFinal}</td>
+                        <td class="grade-cell">${totalOverall}/${maxTotalOverall}</td>
+                        <td class="grade-cell"><span class="${overallPercentageClass}">${overallPercentage}%</span></td>
+                    </tr>
+                `;
+            }
+
+            summaryBody.innerHTML = summaryHTML;
+        }
+    </script>
+</body>
+</html>
