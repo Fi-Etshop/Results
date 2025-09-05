@@ -559,19 +559,19 @@
                 research: 10,
                 midterm: 40,
                 final: 50,
-                total: 394
+                total: 380
             },
             term2: {
                 attendance: 8,
                 assignment: 150,
                 final: 50,
-                total: 208
+                total: 200
             },
             term3: {
                 attendance: 7,
                 assignment: 140,
                 final: 50,
-                total: 197
+                total: 190
             }
         };
 
@@ -836,4 +836,8 @@
                     if (percentage < 80) percentageClass = 'percentage-warning';
                     if (percentage < 60) percentageClass = 'percentage-danger';
 
-                    summary
+                    summaryHTML += `
+                        <tr>
+                            <td>${term.name}</td>
+                            <td class="grade-cell">${attendance}/${maxAttendance}</td>
+                            <td class="grade
