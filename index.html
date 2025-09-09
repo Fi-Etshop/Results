@@ -690,6 +690,10 @@
         }
 
         async function searchGrades() {
+            // التأكد من تحميل البيانات أولاً
+            if (!studentsData || studentsData.length === 0) {
+                await loadStudentsData();
+            }
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
