@@ -4,241 +4,535 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معهد في اتشوب لدراسة الكتاب المقدس</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --primary-color: #752214;
+            --secondary-color: #a03428;
+            --accent-color: #d4af37;
+            --success-color: #2e7d32;
+            --error-color: #d32f2f;
+            --term1-color: #2e7d32;
+            --term2-color: #1976d2;
+            --term3-color: #f57c00;
+            --bg-gradient: linear-gradient(135deg, #f5f0e8 0%, #e8ddd4 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            margin: 0;
-            padding: 10px;
+            background: var(--bg-gradient);
+            min-height: 100vh;
             text-align: center;
             direction: rtl;
-            background: linear-gradient(135deg, #f5f0e8 0%, #e8ddd4 100%);
-            min-height: 100vh;
+            padding: 15px;
+            color: #333;
         }
         
-        h1 {
-            margin: 20px 0;
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            color: #752214;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
-
-        h2 {
-            margin: 30px 0 15px 0;
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: #752214;
-            border-bottom: 2px solid #752214;
-            padding-bottom: 10px;
+        
+        .header {
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        .logo-container {
             position: relative;
-        }
-
-        h2:after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(90deg, #752214, #a03428);
-        }
-        
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px auto;
-            max-width: 500px;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: inline-block;
+            margin-bottom: 20px;
         }
         
         .logo {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            margin: 20px 0;
-            border: 3px solid #752214;
-            border-radius: 15px;
-            transition: transform 0.3s ease;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
         }
 
         .logo:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 15px 35px rgba(117, 34, 20, 0.3);
         }
         
-        label {
-            font-size: 18px;
-            font-weight: bold;
-            color: #752214;
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto 40px;
+            max-width: 500px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 12px;
             display: block;
         }
         
-        input {
+        .input-field {
             width: 100%;
-            max-width: 300px;
-            padding: 15px;
+            padding: 18px 20px;
             font-size: 16px;
             text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            background-color: #fafafa;
-            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #fafafa;
+            transition: var(--transition);
+            position: relative;
         }
 
-        input:focus {
+        .input-field:focus {
             outline: none;
-            border-color: #752214;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(117, 34, 20, 0.2);
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(117, 34, 20, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-field:valid {
+            border-color: var(--success-color);
         }
         
-        button {
+        .search-button {
             width: 100%;
-            max-width: 300px;
-            padding: 15px;
+            padding: 18px;
             font-size: 18px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #752214, #a03428);
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        button:before {
+        .search-button:before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
         }
 
-        button:hover:before {
+        .search-button:hover:before {
             left: 100%;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(117, 34, 20, 0.3);
-        }
-        
-        button:active {
-            transform: translateY(0);
+        .search-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(117, 34, 20, 0.4);
         }
 
-        button:disabled {
-            background: #ccc;
+        .search-button:active {
+            transform: translateY(-1px);
+        }
+
+        .search-button:disabled {
+            background: linear-gradient(135deg, #ccc, #aaa);
             cursor: not-allowed;
             transform: none;
         }
-        
-        .results-section {
-            width: 100%;
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 10px;
-        }
-        
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin: 20px 0;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            background: white;
-        }
-        
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 700px;
-            background-color: white;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        
-        th, td {
-            padding: 15px 10px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-        }
-        
-        th {
-            color: white;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
 
-        .grade-header {
-            font-size: 0.9em;
-            line-height: 1.2;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 20px auto;
+            max-width: 500px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .student-info-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+            box-shadow: var(--card-shadow);
+            border-top: 6px solid var(--accent-color);
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .student-info-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .student-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
+        }
+
+        .student-detail:last-child {
+            border-bottom: none;
+        }
+
+        .student-detail strong {
+            color: var(--primary-color);
+        }
+
+        .results-container {
+            margin: 40px 0;
+        }
+
+        .term-section {
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .section-title {
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            color: var(--primary-color);
+            margin: 30px 0 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin: 20px auto;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        .table-header {
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 20px 12px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .max-grade {
-            display: block;
-            font-size: 0.8em;
+            font-size: 0.85rem;
             opacity: 0.9;
-            margin-top: 2px;
+            font-weight: 500;
         }
         
-        .term1-header {
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
+        .term1-header { background: linear-gradient(135deg, var(--term1-color), #4caf50); }
+        .term2-header { background: linear-gradient(135deg, var(--term2-color), #2196f3); }
+        .term3-header { background: linear-gradient(135deg, var(--term3-color), #ff9800); }
+        .summary-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+        
+        .table-cell {
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .grade-cell {
+            font-weight: 600;
+            color: var(--primary-color);
         }
         
-        .term2-header {
-            background: linear-gradient(135deg, #1976d2, #2196f3);
-        }
-        
-        .term3-header {
-            background: linear-gradient(135deg, #f57c00, #ff9800);
-        }
-        
-        .summary-header {
-            background: linear-gradient(135deg, #752214, #a03428);
-        }
-        
-        td {
-            background-color: white;
-            transition: background-color 0.3s ease;
-        }
-        
-        tr:nth-child(even) td {
+        .table-row:nth-child(even) .table-cell {
             background-color: #f9f9f9;
         }
 
-        tr:hover td {
+        .table-row:hover .table-cell {
             background-color: #f0f8ff;
+            transform: scale(1.02);
+        }
+
+        .total-row .table-cell {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9) !important;
+            font-weight: 700;
+            border-top: 3px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .no-data-row .table-cell {
+            color: #666;
+            font-style: italic;
+            background: #f5f5f5 !important;
+            padding: 30px;
+        }
+
+        .percentage-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent-color), #f4e68c);
+            color: #333;
         }
         
-        .hidden {
-            display: none;
+        .quote-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px auto;
+            max-width: 700px;
+            box-shadow: var(--card-shadow);
+            border-right: 6px solid var(--accent-color);
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-style: italic;
+            line-height: 1.6;
+            animation: fadeIn 0.8s ease-out 1s both;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .hidden { display: none; }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            .search-card, .student-info-card { 
+                margin: 15px auto;
+                padding: 20px; 
+            }
+            
+            .table-header, .table-cell { 
+                padding: 12px 8px;
+                font-size: 0.9rem; 
+            }
+            
+            .results-table { min-width: 500px; }
+            
+            .logo {
+                width: 100px;
+                height: 100px;
+                font-size: 36px;
+            }
         }
         
-        .error-message {
-            color: #d32f2f;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #ffebee, #ffcdd2);
-            border-radius: 10px;
-            border: 1px solid #d32f2f;
+        @media (max-width: 480px) {
+            .table-header, .table-cell { 
+                padding: 10px 6px;
+                font-size: 0.85rem; 
+            }
+            
+            .results-table { min-width: 400px; }
+            
+            .search-card, .student-info-card { 
+                margin: 10px 5px;
+                padding: 15px; 
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body { 
+                background: white; 
+                padding: 0;
+            }
+            
+            .search-card, .message { display: none; }
+            
+            .table-wrapper { 
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-gradient: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            }
+            
+            body {
+                color: #e0e0e0;
+            }
+            
+            .search-card, .student-info-card, .table-wrapper, .quote-card, .stat-card {
+                background: rgba(50, 50, 50, 0.95);
+                color: #e0e0e0;
+            }
+        }
+
+        /* Accessibility improvements */
+        .search-button:focus,
+        .input-field:focus {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Enhanced visual feedback */
+        .input-field.error {
+            border-color: var(--error-color);
             animation: shake 0.5s ease-in-out;
         }
 
@@ -247,646 +541,273 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
-        
-        .quote {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: #752214;
-            margin: 30px 20px;
-            font-weight: bold;
-            padding: 25px;
-            background: linear-gradient(135deg, white, #fafafa);
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-right: 5px solid #752214;
-            font-style: italic;
-        }
-        
-        .student-info {
-            background: linear-gradient(135deg, white, #f8f9fa);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px auto;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-top: 4px solid #752214;
-        }
-        
-        .student-info h3 {
-            color: #752214;
-            margin-top: 0;
-            font-size: 1.4rem;
-            text-align: center;
-        }
-
-        .student-info p {
-            margin: 10px 0;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .student-info strong {
-            color: #752214;
-        }
-        
-        /* Loading animation */
-        .loading {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #752214;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-message {
-            color: #2e7d32;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-            border-radius: 10px;
-            border: 1px solid #2e7d32;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .grade-cell {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .grade-fraction {
-            color: #555;
-            font-size: 0.9em;
-        }
-
-        .grade-value {
-            color: #2e7d32;
-            font-weight: bold;
-        }
-
-        .total-row {
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9) !important;
-            font-weight: bold;
-            border-top: 2px solid #2e7d32;
-        }
-
-        .no-data-row {
-            color: #666;
-            font-style: italic;
-            background: #f5f5f5 !important;
-        }
-
-        .percentage-good {
-            color: #2e7d32;
-            font-weight: bold;
-        }
-
-        .percentage-warning {
-            color: #f57c00;
-            font-weight: bold;
-        }
-
-        .percentage-danger {
-            color: #d32f2f;
-            font-weight: bold;
-        }
-        
-        /* Mobile specific styles */
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-            
-            .container {
-                margin: 10px;
-                padding: 15px;
-            }
-            
-            th, td {
-                padding: 10px 6px;
-                font-size: 13px;
-            }
-            
-            .logo {
-                max-width: 250px;
-            }
-            
-            .quote {
-                margin: 20px 10px;
-                padding: 20px;
-                font-size: 16px;
-            }
-
-            .student-info {
-                margin: 15px 5px;
-                padding: 20px;
-            }
-
-            table {
-                min-width: 600px;
-            }
-
-            .max-grade {
-                font-size: 0.7em;
-            }
-        }
-        
-        /* Very small screens */
-        @media (max-width: 480px) {
-            th, td {
-                padding: 8px 4px;
-                font-size: 12px;
-            }
-            
-            .table-container {
-                margin: 15px -5px;
-            }
-
-            table {
-                min-width: 500px;
-            }
-
-            .container {
-                margin: 5px;
-                padding: 10px;
-            }
-
-            .max-grade {
-                font-size: 0.65em;
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .container {
-                box-shadow: none;
-            }
-            
-            button, input {
-                display: none;
-            }
-            
-            .table-container {
-                box-shadow: none;
-            }
-        }
     </style>
 </head>
 <body>
-    <img src="logo.png" alt="شعار المعهد" class="logo" onerror="this.style.display='none'">
-    <h1>نتيجة السنة الأولى</h1>
-    
-    <div class="container">
-        <label for="nationalID">الرقم القومي</label>
-        <input type="text" id="nationalID" placeholder="أدخل الرقم القومي" maxlength="14">
-        <button onclick="searchGrades()" id="searchButton">البحث عن النتيجة</button>
-        <div id="loadingSpinner" class="loading hidden"></div>
-        <div id="errorMessage" class="error-message hidden"></div>
-        <div id="successMessage" class="success-message hidden"></div>
-    </div>
+    <div class="main-container">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">📚</div>
+            </div>
+            <h1>معهد في اتشوب لدراسة الكتاب المقدس</h1>
+            <p class="subtitle">نتيجة السنة الأولى</p>
+        </header>
 
-    <!-- Student Info -->
-    <div id="studentInfo" class="student-info hidden">
-        <h3>معلومات الطالب</h3>
-        <p><strong>الاسم:</strong> <span id="studentName"></span></p>
-        <p><strong>الكود:</strong> <span id="studentCode"></span></p>
-    </div>
-
-    <div id="resultsSection" class="results-section hidden">
-        <!-- الترم الأول -->
-        <h2>نتيجة الترم الأول</h2>
-        <div class="table-container">
-            <table id="term1Table">
-                <thead>
-                    <tr class="term1-header">
-                        <th class="grade-header">الحضور<span class="max-grade"> 14</span></th>
-                        <th class="grade-header">الواجب<span class="max-grade"> 280</span></th>
-                        <th class="grade-header">البحث<span class="max-grade"> 10</span></th>
-                        <th class="grade-header">الميدترم<span class="max-grade"> 40</span></th>
-                        <th class="grade-header">الفاينال<span class="max-grade"> 50</span></th>
-                    </tr>
-                </thead>
-                <tbody id="term1Body"></tbody>
-            </table>
+        <div class="search-card">
+            <div class="input-group">
+                <label for="nationalID" class="input-label">الرقم القومي</label>
+                <input 
+                    type="text" 
+                    id="nationalID" 
+                    class="input-field"
+                    placeholder="أدخل الرقم القومي (14 رقم)" 
+                    maxlength="14"
+                    required
+                >
+            </div>
+            <button onclick="searchGrades()" id="searchButton" class="search-button">
+                البحث عن النتيجة
+            </button>
+            <div id="loadingSpinner" class="loading-spinner hidden"></div>
+            <div id="errorMessage" class="message error-message hidden"></div>
+            <div id="successMessage" class="message success-message hidden"></div>
         </div>
 
-        <!-- الترم الثاني -->
-        <h2>نتيجة الترم الثاني</h2>
-        <div class="table-container">
-            <table id="term2Table">
-                <thead>
-                    <tr class="term2-header">
-                        <th class="grade-header">الحضور<span class="max-grade"> 8</span></th>
-                        <th class="grade-header">الواجب<span class="max-grade"> 150</span></th>
-                        <th class="grade-header">الفاينال<span class="max-grade"> 50</span></th>
-                    </tr>
-                </thead>
-                <tbody id="term2Body"></tbody>
-            </table>
+        <div id="studentInfo" class="student-info-card hidden">
+            <h3>👤 معلومات الطالب</h3>
+            <div class="student-detail">
+                <strong>الاسم:</strong>
+                <span id="studentName"></span>
+            </div>
+            <div class="student-detail">
+                <strong>الكود:</strong>
+                <span id="studentCode"></span>
+            </div>
         </div>
 
-        <!-- الترم الثالث -->
-        <h2>نتيجة الترم الثالث</h2>
-        <div class="table-container">
-            <table id="term3Table">
-                <thead>
-                    <tr class="term3-header">
-                        <th class="grade-header">الحضور<span class="max-grade"> 7</span></th>
-                        <th class="grade-header">الواجب<span class="max-grade"> 140</span></th>
-                        <th class="grade-header">الفاينال<span class="max-grade"> 50</span></th>
-                    </tr>
-                </thead>
-                <tbody id="term3Body"></tbody>
-            </table>
+        <div id="statsGrid" class="stats-grid hidden">
+            <div class="stat-card">
+                <div class="stat-number" id="totalAttendance">0</div>
+                <div class="stat-label">إجمالي الحضور</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAssignments">0</div>
+                <div class="stat-label">إجمالي الواجبات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalGrade">0</div>
+                <div class="stat-label">إجمالي الدرجات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="overallPercentage">0%</div>
+                <div class="stat-label">النسبة المئوية</div>
+            </div>
         </div>
 
-        <!-- ملخص السنة -->
-        <h2>ملخص السنة الأولى</h2>
-        <div class="table-container">
-            <table id="summaryTable">
-                <thead>
-                    <tr class="summary-header">
-                        <th>الترم</th>
-                        <th>إجمالي الحضور</th>
-                        <th>إجمالي الواجب</th>
-                        <th>إجمالي الفاينال</th>
-                        <th>إجمالي الترم</th>
-                        <th>النسبة المئوية</th>
-                    </tr>
-                </thead>
-                <tbody id="summaryBody"></tbody>
-            </table>
-        </div>
-    </div>
+        <div id="resultsSection" class="results-container hidden">
+            <!-- Term 1 Results -->
+            <div class="term-section">
+                <h2 class="section-title">🎯 نتيجة الترم الأول</h2>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th class="table-header term1-header">الحضور<br><span class="max-grade">(14)</span></th>
+                                <th class="table-header term1-header">الواجب<br><span class="max-grade">(280)</span></th>
+                                <th class="table-header term1-header">البحث<br><span class="max-grade">(10)</span></th>
+                                <th class="table-header term1-header">الميدتيرم<br><span class="max-grade">(40)</span></th>
+                                <th class="table-header term1-header">الفاينال<br><span class="max-grade">(50)</span></th>
+                                <th class="table-header term1-header">المجموع<br><span class="max-grade">(394)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="term1Body"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    <div id="quote" class="quote hidden">
-        نقرأ وندرس ... لنحيا ونكرز
+            <!-- Term 2 Results -->
+            <div class="term-section">
+                <h2 class="section-title">📈 نتيجة الترم الثاني</h2>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th class="table-header term2-header">الحضور<br><span class="max-grade">(8)</span></th>
+                                <th class="table-header term2-header">الواجب<br><span class="max-grade">(150)</span></th>
+                                <th class="table-header term2-header">الفاينال<br><span class="max-grade">(50)</span></th>
+                                <th class="table-header term2-header">المجموع<br><span class="max-grade">(208)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="term2Body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Term 3 Results -->
+            <div class="term-section">
+                <h2 class="section-title">🏆 نتيجة الترم الثالث</h2>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th class="table-header term3-header">الحضور<br><span class="max-grade">(7)</span></th>
+                                <th class="table-header term3-header">الواجب<br><span class="max-grade">(140)</span></th>
+                                <th class="table-header term3-header">الفاينال<br><span class="max-grade">(50)</span></th>
+                                <th class="table-header term3-header">المجموع<br><span class="max-grade">(197)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="term3Body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="term-section">
+                <h2 class="section-title">📊 ملخص السنة الأولى</h2>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th class="table-header summary-header">الترم</th>
+                                <th class="table-header summary-header">الحضور</th>
+                                <th class="table-header summary-header">الواجبات</th>
+                                <th class="table-header summary-header">الامتحانات</th>
+                                <th class="table-header summary-header">المجموع</th>
+                                <th class="table-header summary-header">النسبة المئوية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="quote" class="quote-card hidden">
+            ✨ نقرأ وندرس ... لنحيا ونكرز ✨
+        </div>
     </div>
 
     <script>
-        // Add Enter key support for input
-        document.getElementById('nationalID').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                searchGrades();
-            }
-        });
-
-        // Input validation - only numbers
-        document.getElementById('nationalID').addEventListener('input', function(event) {
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-
-        // Maximum grades configuration
-        const maxGrades = {
-            term1: {
-                attendance: 14,
-                assignment: 280,
-                research: 10,
-                midterm: 40,
-                final: 50,
-                total: 380
-            },
-            term2: {
-                attendance: 8,
-                assignment: 150,
-                final: 50,
-                total: 200
-            },
-            term3: {
-                attendance: 7,
-                assignment: 140,
-                final: 50,
-                total: 190
+        // Configuration
+        const CONFIG = {
+            API_BASE_URL: 'https://74.249.193.181.nip.io',
+            REQUEST_TIMEOUT: 15000,
+            MAX_GRADES: {
+                term1: { attendance: 14, assignment: 280, research: 10, midterm: 40, final: 50, total: 394 },
+                term2: { attendance: 8, assignment: 150, final: 50, total: 208 },
+                term3: { attendance: 7, assignment: 140, final: 50, total: 197 }
             }
         };
 
-        async function searchGrades() {
-            const nationalID = document.getElementById('nationalID').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
-            const resultsSection = document.getElementById('resultsSection');
-            const studentInfo = document.getElementById('studentInfo');
-            const quote = document.getElementById('quote');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const searchButton = document.getElementById('searchButton');
+        // DOM Elements
+        const elements = {
+            nationalID: document.getElementById('nationalID'),
+            searchButton: document.getElementById('searchButton'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            errorMessage: document.getElementById('errorMessage'),
+            successMessage: document.getElementById('successMessage'),
+            studentInfo: document.getElementById('studentInfo'),
+            statsGrid: document.getElementById('statsGrid'),
+            resultsSection: document.getElementById('resultsSection'),
+            quote: document.getElementById('quote'),
+            studentName: document.getElementById('studentName'),
+            studentCode: document.getElementById('studentCode')
+        };
 
-            // Clear previous results
-            errorMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            studentInfo.classList.add('hidden');
-            quote.classList.add('hidden');
+        // Event Listeners
+        elements.nationalID.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchGrades();
+        });
 
-            if (!nationalID) {
-                showError("برجاء إدخال الرقم القومي");
-                return;
+        elements.nationalID.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            if (e.target.classList.contains('error')) {
+                e.target.classList.remove('error');
             }
+        });
 
-            if (nationalID.length !== 14) {
-                showError("الرقم القومي يجب أن يكون 14 رقم");
-                return;
+        // Utility Functions
+        function showMessage(element, message, duration = 3000) {
+            element.textContent = message;
+            element.classList.remove('hidden');
+            if (duration > 0) {
+                setTimeout(() => element.classList.add('hidden'), duration);
             }
+        }
 
-            // Show loading spinner and disable button
-            loadingSpinner.classList.remove('hidden');
-            searchButton.disabled = true;
-            searchButton.textContent = 'جاري البحث...';
+        function hideAllMessages() {
+            elements.errorMessage.classList.add('hidden');
+            elements.successMessage.classList.add('hidden');
+            elements.studentInfo.classList.add('hidden');
+            elements.statsGrid.classList.add('hidden');
+            elements.resultsSection.classList.add('hidden');
+            elements.quote.classList.add('hidden');
+        }
 
+        function setLoadingState(isLoading) {
+            elements.loadingSpinner.classList.toggle('hidden', !isLoading);
+            elements.searchButton.disabled = isLoading;
+            elements.searchButton.textContent = isLoading ? 'جاري البحث...' : 'البحث عن النتيجة';
+        }
+
+        function validateNationalID(id) {
+            if (!id) return 'برجاء إدخال الرقم القومي';
+            if (id.length !== 14) return 'الرقم القومي يجب أن يكون 14 رقم';
+            return null;
+        }
+
+        // API Functions
+        async function fetchWithTimeout(url, options = {}, timeout = CONFIG.REQUEST_TIMEOUT) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
             try {
-                // جلب نتائج الثلاث ترمات
-                const [term1Result, term2Result, term3Result] = await Promise.all([
-                    fetchTermResults(nationalID, 1),
-                    fetchTermResults(nationalID, 2),
-                    fetchTermResults(nationalID, 3)
-                ]);
-
-                // Hide loading spinner and enable button
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
-
-                // التحقق من وجود بيانات لأي ترم
-                if (!term1Result.success && !term2Result.success && !term3Result.success) {
-                    showError("الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة");
-                    return;
-                }
-
-                // عرض معلومات الطالب من أول ترم متاح
-                const studentData = term1Result.data || term2Result.data || term3Result.data;
-                if (studentData) {
-                    document.getElementById('studentName').textContent = studentData["الاسم"] || "غير محدد";
-                    document.getElementById('studentCode').textContent = studentData["الكود"] || "غير محدد";
-                    studentInfo.classList.remove('hidden');
-                }
-
-                // عرض نتائج كل ترم
-                displayTermResults(term1Result, 'term1Body', 1);
-                displayTermResults(term2Result, 'term2Body', 2);
-                displayTermResults(term3Result, 'term3Body', 3);
-
-                // عرض الملخص
-                displaySummary(term1Result, term2Result, term3Result);
-
-                resultsSection.classList.remove('hidden');
-                quote.classList.remove('hidden');
-                
-                showSuccess("تم العثور على النتائج بنجاح!");
-
-                // Scroll to results
-                setTimeout(() => {
-                    studentInfo.scrollIntoView({ behavior: 'smooth' });
-                }, 500);
-
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                clearTimeout(timeoutId);
+                return response;
             } catch (error) {
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
-                showError("حدث خطأ في الاتصال. برجاء المحاولة مرة أخرى");
-                console.error('Error:', error);
+                clearTimeout(timeoutId);
+                throw error;
             }
         }
 
         async function fetchTermResults(nationalID, termNumber) {
             try {
-                // محاولة الاتصال بـ API الأصلي أولاً
-                const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}?term=${termNumber}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    timeout: 10000 // 10 seconds timeout
-                });
+                const response = await fetchWithTimeout(
+                    `${CONFIG.API_BASE_URL}/student/${nationalID}?term=${termNumber}`
+                );
                 
                 if (response.ok) {
                     const data = await response.json();
-                    return { success: true, data: data, term: termNumber };
+                    return { success: true, data, term: termNumber };
                 } else if (response.status === 404) {
                     return { success: false, term: termNumber, error: 'not_found' };
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
-                console.log(`Error fetching term ${termNumber}:`, error);
+                console.warn(`Error fetching term ${termNumber}:`, error);
                 
-                // محاولة بديلة بدون معامل الترم
                 try {
-                    const fallbackResponse = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        timeout: 10000
-                    });
+                    const fallbackResponse = await fetchWithTimeout(
+                        `${CONFIG.API_BASE_URL}/student/${nationalID}`
+                    );
                     
                     if (fallbackResponse.ok) {
                         const data = await fallbackResponse.json();
-                        
-                        // البحث عن بيانات الترم المحدد في الاستجابة
                         if (data[`term${termNumber}`]) {
                             return { success: true, data: data[`term${termNumber}`], term: termNumber };
                         } else if (termNumber === 1 && data) {
-                            // إذا كان الترم الأول والبيانات متاحة مباشرة
-                            return { success: true, data: data, term: termNumber };
+                            return { success: true, data, term: termNumber };
                         }
                     }
                 } catch (fallbackError) {
-                    console.log('Fallback request also failed:', fallbackError);
-                }
-                
-                return { success: false, term: termNumber, error: 'connection_failed' };
-            }
-        }
-
-        function formatGradeWithMax(value, maxValue) {
-            const percentage = maxValue > 0 ? ((value / maxValue) * 100) : 0;
-            let cssClass = 'grade-value';
-            
-            if (percentage >= 80) {
-                cssClass += ' percentage-good';
-            } else if (percentage >= 60) {
-                cssClass += ' percentage-warning';
-            } else {
-                cssClass += ' percentage-danger';
-            }
-            
-            return `<span class="${cssClass}">${value}</span><span class="grade-fraction">/${maxValue}</span>`;
-        }
-
-        function displayTermResults(termResult, bodyId, termNumber) {
-            const tbody = document.getElementById(bodyId);
-            
-            if (!termResult.success || !termResult.data) {
-                const colspan = termNumber === 1 ? 5 : 3;
-                tbody.innerHTML = `<tr class="no-data-row"><td colspan="${colspan}">لا توجد نتائج متاحة لهذا الترم</td></tr>`;
-                return;
-            }
-
-            const data = termResult.data;
-            const termConfig = maxGrades[`term${termNumber}`];
-            let html = '';
-
-            if (termNumber === 1) {
-                const attendance = data["الحضور"] || 0;
-                const assignment = data["الواجب"] || 0;
-                const research = data["البحث"] || 0;
-                const midterm = data["الميدترم"] || 0;
-                const finalExam = data["الفاينال"] || 0;
-
-                html = `
-                    <tr>
-                        <td class="grade-cell">${formatGradeWithMax(attendance, termConfig.attendance)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(assignment, termConfig.assignment)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(research, termConfig.research)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(midterm, termConfig.midterm)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(finalExam, termConfig.final)}</td>
-                    </tr>
-                `;
-            } else {
-                const attendance = data["الحضور"] || 0;
-                const assignment = data["الواجب"] || 0;
-                const finalExam = data["الفاينال"] || 0;
-
-                html = `
-                    <tr>
-                        <td class="grade-cell">${formatGradeWithMax(attendance, termConfig.attendance)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(assignment, termConfig.assignment)}</td>
-                        <td class="grade-cell">${formatGradeWithMax(finalExam, termConfig.final)}</td>
-                    </tr>
-                `;
-            }
-
-            tbody.innerHTML = html;
-        }
-
-        function displaySummary(term1, term2, term3) {
-            const summaryBody = document.getElementById('summaryBody');
-            let summaryHTML = '';
-
-            const terms = [
-                { name: 'الترم الأول', data: term1, config: maxGrades.term1 },
-                { name: 'الترم الثاني', data: term2, config: maxGrades.term2 },
-                { name: 'الترم الثالث', data: term3, config: maxGrades.term3 }
-            ];
-
-            let totalAttendance = 0;
-            let totalAssignmentResearch = 0;
-            let totalMidtermFinal = 0;
-            let totalOverall = 0;
-            let maxTotalAttendance = 0;
-            let maxTotalAssignmentResearch = 0;
-            let maxTotalMidtermFinal = 0;
-            let maxTotalOverall = 0;
-
-            terms.forEach(term => {
-                if (term.data.success && term.data.data) {
-                    const data = term.data.data;
-                    const termNum = term.data.term;
-                    const config = term.config;
-                    
-                    let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
-                    let maxAttendance, maxAssignmentResearch, maxMidtermFinal;
-                    
-                    if (termNum === 1) {
-                        attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
-                        const research = data["البحث"] || 0;
-                        const midterm = data["الميدترم"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        
-                        assignmentResearch = assignment + research;
-                        midtermFinal = midterm + finalExam;
-                        termTotal = attendance + assignmentResearch + midtermFinal;
-                        
-                        maxAttendance = config.attendance;
-                        maxAssignmentResearch = config.assignment + config.research;
-                        maxMidtermFinal = config.midterm + config.final;
-                    } else {
-                        attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        
-                        assignmentResearch = assignment;
-                        midtermFinal = finalExam;
-                        termTotal = attendance + assignmentResearch + midtermFinal;
-                        
-                        maxAttendance = config.attendance;
-                        maxAssignmentResearch = config.assignment;
-                        maxMidtermFinal = config.final;
-                    }
-
-                    percentage = ((termTotal / config.total) * 100).toFixed(1);
-                    let percentageClass = 'percentage-good';
-                    if (percentage < 80) percentageClass = 'percentage-warning';
-                    if (percentage < 60) percentageClass = 'percentage-danger';
-
-                    summaryHTML += `
-                        <tr>
-                            <td>${term.name}</td>
-                            <td class="grade-cell">${attendance}/${maxAttendance}</td>
-                            <td class="grade-cell">${assignmentResearch}/${maxAssignmentResearch}</td>
-                            <td class="grade-cell">${midtermFinal}/${maxMidtermFinal}</td>
-                            <td class="grade-cell">${termTotal}/${config.total}</td>
-                            <td class="grade-cell"><span class="${percentageClass}">${percentage}%</span></td>
-                        </tr>
-                    `;
-
-                    // إضافة للمجاميع الإجمالية
-                    totalAttendance += attendance;
-                    totalAssignmentResearch += assignmentResearch;
-                    totalMidtermFinal += midtermFinal;
-                    totalOverall += termTotal;
-                    maxTotalAttendance += maxAttendance;
-                    maxTotalAssignmentResearch += maxAssignmentResearch;
-                    maxTotalMidtermFinal += maxMidtermFinal;
-                    maxTotalOverall += config.total;
-                } else {
-                    summaryHTML += `
-                        <tr>
-                            <td>${term.name}</td>
-                            <td class="grade-cell no-data-row" colspan="5">لا توجد نتائج متاحة</td>
-                        </tr>
-                    `;
-                }
-            });
-
-            // إضافة صف الإجمالي
-            if (maxTotalOverall > 0) {
-                const overallPercentage = ((totalOverall / maxTotalOverall) * 100).toFixed(1);
-                let overallPercentageClass = 'percentage-good';
-                if (overallPercentage < 80) overallPercentageClass = 'percentage-warning';
-                if (overallPercentage < 60) overallPercentageClass = 'percentage-danger';
-
-                summaryHTML += `
-                    <tr style="background-color: #f0f8ff; font-weight: bold; border-top: 2px solid #667eea;">
-                        <td>الإجمالي العام</td>
-                        <td class="grade-cell">${totalAttendance}/${maxTotalAttendance}</td>
-                        <td class="grade-cell">${totalAssignmentResearch}/${maxTotalAssignmentResearch}</td>
-                        <td class="grade-cell">${totalMidtermFinal}/${maxTotalMidtermFinal}</td>
-                        <td class="grade-cell">${totalOverall}/${maxTotalOverall}</td>
-                        <td class="grade-cell"><span class="${overallPercentageClass}">${overallPercentage}%</span></td>
-                    </tr>
-                `;
-            }
-
-            summaryBody.innerHTML = summaryHTML;
-        }
-    </script>
-</body>
-</html>
+                    console.warn('Fallback request failed:', fallbackError
