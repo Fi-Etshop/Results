@@ -172,10 +172,10 @@
         }
         
         th, td {
-            padding: 12px 8px;
+            padding: 15px 10px;
             text-align: center;
             border-bottom: 1px solid #eee;
-            font-size: clamp(0.8rem, 2.2vw, 1rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
         }
         
         th {
@@ -184,26 +184,32 @@
             position: sticky;
             top: 0;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            vertical-align: middle;
         }
 
-        /* تحسين عرض العناوين */
-        .column-header {
-            padding: 8px 6px;
+        /* التصميم الجديد للهيدر مع اسم العمود والدرجة تحته */
+        .grade-header {
+            padding: 10px;
+        }
+
+        .grade-header .header-title {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
             line-height: 1.2;
         }
 
-        .column-title {
+        .grade-header .max-grade {
             display: block;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        .max-grade {
-            display: block;
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-size: 0.9rem;
             font-weight: normal;
             opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin: 0 auto;
+            width: fit-content;
         }
         
         .term1-header {
@@ -356,21 +362,17 @@
             }
             
             th, td {
-                padding: 8px 4px;
-                font-size: 12px;
+                padding: 10px 6px;
+                font-size: 13px;
             }
 
-            .column-header {
-                padding: 6px 3px;
+            .grade-header .header-title {
+                font-size: 0.95rem;
             }
 
-            .column-title {
-                font-size: 11px;
-                margin-bottom: 2px;
-            }
-
-            .max-grade {
-                font-size: 10px;
+            .grade-header .max-grade {
+                font-size: 0.8rem;
+                padding: 2px 6px;
             }
             
             .logo {
@@ -396,20 +398,17 @@
         /* Very small screens */
         @media (max-width: 480px) {
             th, td {
-                padding: 6px 3px;
-                font-size: 11px;
+                padding: 8px 4px;
+                font-size: 12px;
             }
 
-            .column-header {
-                padding: 5px 2px;
+            .grade-header .header-title {
+                font-size: 0.85rem;
             }
 
-            .column-title {
-                font-size: 10px;
-            }
-
-            .max-grade {
-                font-size: 9px;
+            .grade-header .max-grade {
+                font-size: 0.7rem;
+                padding: 2px 4px;
             }
             
             .table-container {
@@ -473,24 +472,24 @@
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
-                        <th class="column-header">
-                            <span class="column-title">الحضور</span>
+                        <th class="grade-header">
+                            <span class="header-title">الحضور</span>
                             <span class="max-grade">14</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الواجب</span>
+                        <th class="grade-header">
+                            <span class="header-title">الواجب</span>
                             <span class="max-grade">280</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">البحث</span>
+                        <th class="grade-header">
+                            <span class="header-title">البحث</span>
                             <span class="max-grade">10</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الميدترم</span>
+                        <th class="grade-header">
+                            <span class="header-title">الميدترم</span>
                             <span class="max-grade">40</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الفاينال</span>
+                        <th class="grade-header">
+                            <span class="header-title">الفاينال</span>
                             <span class="max-grade">50</span>
                         </th>
                     </tr>
@@ -505,16 +504,16 @@
             <table id="term2Table">
                 <thead>
                     <tr class="term2-header">
-                        <th class="column-header">
-                            <span class="column-title">الحضور</span>
+                        <th class="grade-header">
+                            <span class="header-title">الحضور</span>
                             <span class="max-grade">8</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الواجب</span>
+                        <th class="grade-header">
+                            <span class="header-title">الواجب</span>
                             <span class="max-grade">150</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الفاينال</span>
+                        <th class="grade-header">
+                            <span class="header-title">الفاينال</span>
                             <span class="max-grade">50</span>
                         </th>
                     </tr>
@@ -529,16 +528,16 @@
             <table id="term3Table">
                 <thead>
                     <tr class="term3-header">
-                        <th class="column-header">
-                            <span class="column-title">الحضور</span>
+                        <th class="grade-header">
+                            <span class="header-title">الحضور</span>
                             <span class="max-grade">7</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الواجب</span>
+                        <th class="grade-header">
+                            <span class="header-title">الواجب</span>
                             <span class="max-grade">140</span>
                         </th>
-                        <th class="column-header">
-                            <span class="column-title">الفاينال</span>
+                        <th class="grade-header">
+                            <span class="header-title">الفاينال</span>
                             <span class="max-grade">50</span>
                         </th>
                     </tr>
@@ -553,24 +552,12 @@
             <table id="summaryTable">
                 <thead>
                     <tr class="summary-header">
-                        <th class="column-header">
-                            <span class="column-title">الترم</span>
-                        </th>
-                        <th class="column-header">
-                            <span class="column-title">إجمالي الحضور</span>
-                        </th>
-                        <th class="column-header">
-                            <span class="column-title">إجمالي الواجب</span>
-                        </th>
-                        <th class="column-header">
-                            <span class="column-title">إجمالي الفاينال</span>
-                        </th>
-                        <th class="column-header">
-                            <span class="column-title">إجمالي الترم</span>
-                        </th>
-                        <th class="column-header">
-                            <span class="column-title">النسبة المئوية</span>
-                        </th>
+                        <th>الترم</th>
+                        <th>إجمالي الحضور</th>
+                        <th>إجمالي الواجب</th>
+                        <th>إجمالي الفاينال</th>
+                        <th>إجمالي الترم</th>
+                        <th>النسبة المئوية</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
@@ -858,4 +845,99 @@
                         </tr>
                     `;
 
-                    totalAttendance +=
+                    totalAttendance += attendance;
+                    totalAssignmentResearch += assignmentResearch;
+                    totalMidtermFinal += midtermFinal;
+                    totalOverall += termTotal;
+                } else {
+                    summaryHTML += `
+                        <tr class="no-data-row">
+                            <td>${term.name}</td>
+                            <td colspan="5">لا توجد نتائج</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            const overallPercentage = ((totalOverall / 770) * 100).toFixed(1); // إجمالي الدرجات للسنة
+
+            // إضافة صف الإجمالي
+            summaryHTML += `
+                <tr class="total-row">
+                    <td>إجمالي السنة</td>
+                    <td class="grade-cell">${totalAttendance}</td>
+                    <td class="grade-cell">${totalAssignmentResearch}</td>
+                    <td class="grade-cell">${totalMidtermFinal}</td>
+                    <td class="grade-cell">${totalOverall}</td>
+                    <td class="grade-cell">${overallPercentage}%</td>
+                </tr>
+            `;
+
+            summaryBody.innerHTML = summaryHTML;
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Mock data for testing - يمكنك إزالة هذا واستخدام الـ API الحقيقي
+        const mockStudentData = {
+            "29901011234567": {
+                "الاسم": "أحمد محمد علي",
+                "الكود": "ST001",
+                "term1": {
+                    "الحضور": 12,
+                    "الواجب": 250,
+                    "البحث": 8,
+                    "الميدتيرم": 35,
+                    "الفاينال": 45
+                },
+                "term2": {
+                    "الحضور": 7,
+                    "الواجب": 130,
+                    "الفاينال": 42
+                },
+                "term3": {
+                    "الحضور": 6,
+                    "الواجب": 120,
+                    "الفاينال": 38
+                }
+            },
+            "29801021234567": {
+                "الاسم": "فاطمة أحمد محمد",
+                "الكود": "ST002",
+                "term1": {
+                    "الحضور": 14,
+                    "الواجب": 270,
+                    "البحث": 10,
+                    "الميدتيرم": 38,
+                    "الفاينال": 48
+                },
+                "term2": {
+                    "الحضور": 8,
+                    "الواجب": 145,
+                    "الفاينال": 47
+                },
+                "term3": {
+                    "الحضور": 7,
+                    "الواجب": 135,
+                    "الفاينال": 45
+                }
+            }
+        };
+    </script>
+</body>
+</html>
