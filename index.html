@@ -619,19 +619,19 @@
                 research: 10,
                 midterm: 40,
                 final: 50,
-                total: 394
+                total: 380
             },
             term2: {
                 attendance: 8,
                 assignment: 150,
                 final: 50,
-                total: 208
+                total: 200
             },
             term3: {
                 attendance: 7,
                 assignment: 140,
                 final: 50,
-                total: 197
+                total: 190
             }
         };
 
@@ -841,9 +841,9 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 394 },
-                { name: 'الترم الثاني', data: term2, maxTotal: 208 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 197 }
+                { name: 'الترم الأول', data: term1, maxTotal: 380 },
+                { name: 'الترم الثاني', data: term2, maxTotal: 200 },
+                { name: 'الترم الثالث', data: term3, maxTotal: 190 }
             ];
 
             let totalAttendance = 0;
@@ -907,9 +907,9 @@
 
             // حساب النسبة الإجمالية للسنة (على أساس الحد الأقصى للترمات المتاحة)
             let totalMaxGrades = 0;
-            if (term1.success) totalMaxGrades += 394;
-            if (term2.success) totalMaxGrades += 208;
-            if (term3.success) totalMaxGrades += 197;
+            if (term1.success) totalMaxGrades += 380;
+            if (term2.success) totalMaxGrades += 200;
+            if (term3.success) totalMaxGrades += 190;
 
             const overallPercentage = totalMaxGrades > 0 ? ((totalOverall / totalMaxGrades) * 100).toFixed(1) : '0.0';
 
@@ -978,3 +978,4 @@
     </script>
 </body>
 </html>
+
