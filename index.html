@@ -577,27 +577,90 @@
     </div>
 
     <script>
-        // البيانات المحلية للطلاب - مُنظمة حسب الترمات
-        const studentsData = [
-            {
-                "الاسم": "مايكل جمال لمعي دوس",
-                "الرقم القومي": 30207281302955,
-                "الكود": 277,
-                "term1": {
-                    "الحضور": 12,
-                    "الواجب": 250,
-                    "البحث": 8,
-                    "الميدترم": 35,
-                    "الفاينال": 45
-                },
-                "term2": {
-                    "الحضور": 7,
-                    "الواجب": 130,
-                    "الفاينال": 40
+        // متغيرات عامة لحفظ البيانات
+        let studentsData = [];
+        let maxGrades = {};
+        let instituteInfo = {};
+
+        // دالة لتحميل بيانات الطلاب من ملف JSON
+        async function loadStudentsData() {
+            try {
+                const response = await fetch('studentData.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
-                // term3 غير موجود - سيظهر "لا توجد نتائج"
+                
+                const data = await response.json();
+                studentsData = data.students || [];
+                maxGrades = data.maxGrades || getDefaultMaxGrades();
+                instituteInfo = data.institute || {};
+                
+                console.log('تم تحميل بيانات الطلاب بنجاح:', studentsData.length, 'طالب');
+                return true;
+            } catch (error) {
+                console.warn('لم يتم العثور على ملف JSON، سيتم استخدام البيانات المحلية');
+                // الاحتفاظ بالبيانات المدمجة كبديل
+                studentsData = getDefaultStudentsData();
+                maxGrades = getDefaultMaxGrades();
+                return false;
             }
-        ];
+        }
+
+        // البيانات الافتراضية (كما كانت في الكود الأصلي)
+        function getDefaultStudentsData() {
+            return [
+                {
+                    "الاسم": "مايكل جمال لمعي دوس",
+                    "الرقم القومي": "30207281302955",
+                    "الكود": 277,
+                    "term1": {
+                        "الحضور": 12,
+                        "الواجب": 250,
+                        "البحث": 8,
+                        "الميدترم": 35,
+                        "الفاينال": 45
+                    },
+                    "term2": {
+                        "الحضور": 7,
+                        "الواجب": 130,
+                        "الفاينال": 40
+                    }
+                    // term3 غير موجود - سيظهر "لا توجد نتائج"
+                }
+            ];
+        }
+
+        function getDefaultMaxGrades() {
+            return {
+                term1: {
+                    attendance: 14,
+                    assignment: 280,
+                    research: 10,
+                    midterm: 40,
+                    final: 50,
+                    total: 394
+                },
+                term2: {
+                    attendance: 8,
+                    assignment: 150,
+                    final: 50,
+                    total: 208
+                },
+                term3: {
+                    attendance: 7,
+                    assignment: 140,
+                    final: 50,
+                    total: 197
+                }
+            };
+        }
+
+        // دالة محسنة للبحث في البيانات المحلية
+        function getLocalStudentData(nationalID) {
+            return studentsData.find(student => 
+                student["الرقم القومي"].toString() === nationalID.toString()
+            );
+        }
 
         // Add Enter key support for input
         document.getElementById('nationalID').addEventListener('keypress', function(event) {
@@ -610,37 +673,6 @@
         document.getElementById('nationalID').addEventListener('input', function(event) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
-
-        // Maximum grades configuration
-        const maxGrades = {
-            term1: {
-                attendance: 14,
-                assignment: 280,
-                research: 10,
-                midterm: 40,
-                final: 50,
-                total: 380
-            },
-            term2: {
-                attendance: 8,
-                assignment: 150,
-                final: 50,
-                total: 200
-            },
-            term3: {
-                attendance: 7,
-                assignment: 140,
-                final: 50,
-                total: 190
-            }
-        };
-
-        // دالة للبحث في البيانات المحلية
-        function getLocalStudentData(nationalID) {
-            return studentsData.find(student => 
-                student["الرقم القومي"].toString() === nationalID.toString()
-            );
-        }
 
         // دالة محسنة لجلب البيانات
         async function fetchTermResults(nationalID, termNumber) {
@@ -689,11 +721,13 @@
             }
         }
 
+        // دالة البحث المحدثة
         async function searchGrades() {
             // التأكد من تحميل البيانات أولاً
             if (!studentsData || studentsData.length === 0) {
                 await loadStudentsData();
             }
+            
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
@@ -841,9 +875,9 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 380 },
-                { name: 'الترم الثاني', data: term2, maxTotal: 200 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 190 }
+                { name: 'الترم الأول', data: term1, maxTotal: 394 },
+                { name: 'الترم الثاني', data: term2, maxTotal: 208 },
+                { name: 'الترم الثالث', data: term3, maxTotal: 197 }
             ];
 
             let totalAttendance = 0;
@@ -867,7 +901,7 @@
                         
                         assignmentResearch = assignment + research;
                         midtermFinal = midterm + finalExam;
-                        termTotal = assignmentResearch + midtermFinal;
+                        termTotal = attendance + assignmentResearch + midtermFinal;
                     } else {
                         attendance = data["الحضور"] || 0;
                         const assignment = data["الواجب"] || 0;
@@ -875,7 +909,7 @@
                         
                         assignmentResearch = assignment;
                         midtermFinal = finalExam;
-                        termTotal = assignmentResearch + midtermFinal;
+                        termTotal = attendance + assignmentResearch + midtermFinal;
                     }
 
                     percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -907,11 +941,11 @@
 
             // حساب النسبة الإجمالية للسنة (على أساس الحد الأقصى للترمات المتاحة)
             let totalMaxGrades = 0;
-            if (term1.success) totalMaxGrades += 380;
-            if (term2.success) totalMaxGrades += 200;
-            if (term3.success) totalMaxGrades += 190;
+            if (term1.success) totalMaxGrades += 394;
+            if (term2.success) totalMaxGrades += 208;
+            if (term3.success) totalMaxGrades += 197;
 
-            const overallPercentage = totalMaxGrades > 0 ? ((totalOverall / 770) * 100).toFixed(1) : '0.0';
+            const overallPercentage = totalMaxGrades > 0 ? ((totalOverall / totalMaxGrades) * 100).toFixed(1) : '0.0';
 
             // إضافة صف الإجمالي فقط إذا كان هناك نتائج متاحة
             if (totalOverall > 0) {
@@ -957,10 +991,15 @@
             studentsData.push(studentData);
         }
 
+        // تحميل البيانات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudentsData();
+        });
+
         // مثال لإضافة طالب آخر (يمكن حذف هذا الجزء)
         // addStudentData({
         //     "الاسم": "طالب تجريبي",
-        //     "الرقم القومي": 12345678901234,
+        //     "الرقم القومي": "12345678901234",
         //     "الكود": 123,
         //     "term1": {
         //         "الحضور": 12,
@@ -978,8 +1017,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
