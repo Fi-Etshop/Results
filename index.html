@@ -795,7 +795,7 @@
                     termTotal = assignment + final; // بدون الحضور
                 }
 
-                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
+                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(2);
 
                 summaryHTML += `
                     <tr>
@@ -816,7 +816,7 @@
 
             // حساب النسبة الإجمالية للسنة
             const totalMaxGrades = 770; // 380 + 200 + 190
-            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(1);
+            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(2);
 
             // إضافة صف الإجمالي
             summaryHTML += `
@@ -857,4 +857,5 @@
     </script>
 </body>
 </html>
+
 
