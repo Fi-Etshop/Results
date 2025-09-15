@@ -565,6 +565,7 @@
                         <th>إجمالي الفاينال</th>
                         <th>إجمالي الترم</th>
                         <th>النسبة المئوية</th>
+                        <th>التقدير</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
@@ -810,7 +811,7 @@
                     termTotal = assignment + final; // بدون الحضور
                 }
 
-                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
+                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(2);
                 const grade = getGrade(parseFloat(percentage));
 
                 summaryHTML += `
@@ -833,7 +834,7 @@
 
             // حساب النسبة الإجمالية للسنة
             const totalMaxGrades = 770; // 380 + 200 + 190
-            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(1);
+            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(2);
             const overallGrade = getGrade(parseFloat(overallPercentage));
 
             // إضافة صف الإجمالي
@@ -876,6 +877,7 @@
     </script>
 </body>
 </html>
+
 
 
 
