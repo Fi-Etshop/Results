@@ -758,6 +758,21 @@
             tbody.innerHTML = html;
         }
 
+        // دالة حساب التقدير بناءً على النسبة المئوية
+        function getGrade(percentage) {
+            if (percentage >= 85) {
+                return { text: 'امتياز', class: 'grade-excellent' };
+            } else if (percentage >= 75) {
+                return { text: 'جيد جداً', class: 'grade-very-good' };
+            } else if (percentage >= 65) {
+                return { text: 'جيد', class: 'grade-good' };
+            } else if (percentage >= 50) {
+                return { text: 'مقبول', class: 'grade-acceptable' };
+            } else {
+                return { text: 'راسب', class: 'grade-fail' };
+            }
+        }
+
         // دالة عرض الملخص
         function displaySummary(student) {
             const summaryBody = document.getElementById('summaryBody');
@@ -795,7 +810,8 @@
                     termTotal = assignment + final; // بدون الحضور
                 }
 
-                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(2);
+                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
+                const grade = getGrade(parseFloat(percentage));
 
                 summaryHTML += `
                     <tr>
@@ -805,6 +821,7 @@
                         <td class="grade-cell">${summaryFinal}</td>
                         <td class="grade-cell">${termTotal}</td>
                         <td class="grade-cell">${percentage}%</td>
+                        <td class="grade-cell ${grade.class}">${grade.text}</td>
                     </tr>
                 `;
 
@@ -816,7 +833,8 @@
 
             // حساب النسبة الإجمالية للسنة
             const totalMaxGrades = 770; // 380 + 200 + 190
-            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(2);
+            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(1);
+            const overallGrade = getGrade(parseFloat(overallPercentage));
 
             // إضافة صف الإجمالي
             summaryHTML += `
@@ -827,12 +845,13 @@
                     <td class="grade-cell">${totalFinal}</td>
                     <td class="grade-cell">${totalOverall}</td>
                     <td class="grade-cell">${overallPercentage}%</td>
+                    <td class="grade-cell ${overallGrade.class}">${overallGrade.text}</td>
                 </tr>
             `;
 
             summaryBody.innerHTML = summaryHTML;
         }
-
+        
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = message;
@@ -857,5 +876,6 @@
     </script>
 </body>
 </html>
+
 
 
