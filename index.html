@@ -578,6 +578,43 @@
     </div>
 
     <script>
+        // Google Apps Script URL - آمن ومحمي
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbza_cBfktwodIE0Pr7mzho60RlkpaIWahFDvrViTb02/dev";
+
+        // دالة جلب البيانات من Google Apps Script
+        async function fetchStudentData() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const jsonData = await response.json();
+                
+                // التحقق من وجود خطأ في الاستجابة
+                if (jsonData.error) {
+                    throw new Error(jsonData.error);
+                }
+                
+                // التأكد من أن البيانات مصفوفة
+                if (!Array.isArray(jsonData)) {
+                    throw new Error('Invalid data format received');
+                }
+                
+                // فلترة الصفوف الفارغة
+                const studentsData = jsonData.filter(student => 
+                    student["الرقم القومي"] && student["الرقم القومي"].toString().trim()
+                );
+
+                return studentsData;
+                
+            } catch (error) {
+                console.error('Error fetching data from Apps Script:', error);
+                throw new Error('فشل في الاتصال بقاعدة البيانات. تأكد من الاتصال بالإنترنت وحاول مرة أخرى');
+            }
+        }
+        
         // Add Enter key support for input
         document.getElementById('nationalID').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
@@ -589,56 +626,7 @@
         document.getElementById('nationalID').addEventListener('input', function(event) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
-
-        // Google Sheets CSV URL - غير هذا الرابط برابطك
-        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv";
-
-        // دالة جلب البيانات من Google Sheets
-        async function fetchStudentData() {
-            try {
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-                const csvText = await response.text();
-
-                // تحليل CSV
-                const rows = csvText.split("\n").map(row => {
-                    // التعامل مع الفواصل داخل الأقواس
-                    const cells = [];
-                    let currentCell = '';
-                    let insideQuotes = false;
-                    
-                    for (let i = 0; i < row.length; i++) {
-                        const char = row[i];
-                        if (char === '"') {
-                            insideQuotes = !insideQuotes;
-                        } else if (char === ',' && !insideQuotes) {
-                            cells.push(currentCell.trim());
-                            currentCell = '';
-                        } else {
-                            currentCell += char;
-                        }
-                    }
-                    cells.push(currentCell.trim());
-                    return cells;
-                });
-
-                const headers = rows[0];
-                const studentsData = rows.slice(1).map(row => {
-                    const student = {};
-                    row.forEach((value, index) => {
-                        if (headers[index]) {
-                            student[headers[index].trim()] = value.trim();
-                        }
-                    });
-                    return student;
-                }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
-
-                return studentsData;
-            } catch (error) {
-                console.error('Error fetching data from Google Sheets:', error);
-                throw error;
-            }
-        }
-
+        
         // دالة البحث عن الطالب
         async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
@@ -877,6 +865,7 @@
     </script>
 </body>
 </html>
+
 
 
 
