@@ -764,9 +764,9 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', number: 1, maxTotal: 394 }, // 14+280+10+40+50
-                { name: 'الترم الثاني', number: 2, maxTotal: 208 }, // 8+150+50
-                { name: 'الترم الثالث', number: 3, maxTotal: 197 }  // 7+140+50
+                { name: 'الترم الأول', number: 1, maxTotal: 380 }, // 280+10+40+50 (بدون الحضور)
+                { name: 'الترم الثاني', number: 2, maxTotal: 200 }, // 150+50 (بدون الحضور)
+                { name: 'الترم الثالث', number: 3, maxTotal: 190 }  // 140+50 (بدون الحضور)
             ];
 
             let totalAttendance = 0;
@@ -779,13 +779,20 @@
                 const assignment = parseFloat(student[`term${term.number}_assignment`] || student[`الترم${term.number}_الواجب`] || 0);
                 const final = parseFloat(student[`term${term.number}_final`] || student[`الترم${term.number}_الفاينال`] || 0);
                 
-                let termTotal;
+                let summaryAssignment, summaryFinal, termTotal;
+                
                 if (term.number === 1) {
                     const research = parseFloat(student[`term${term.number}_research`] || student[`الترم${term.number}_البحث`] || 0);
                     const midterm = parseFloat(student[`term${term.number}_midterm`] || student[`الترم${term.number}_الميدترم`] || 0);
-                    termTotal = attendance + assignment + research + midterm + final;
+                    
+                    // للترم الأول: إجمالي الواجب = الواجب + البحث، إجمالي الفاينال = الميدترم + الفاينال
+                    summaryAssignment = assignment + research;
+                    summaryFinal = midterm + final;
+                    termTotal = assignment + research + midterm + final; // بدون الحضور
                 } else {
-                    termTotal = attendance + assignment + final;
+                    summaryAssignment = assignment;
+                    summaryFinal = final;
+                    termTotal = assignment + final; // بدون الحضور
                 }
 
                 const percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
@@ -794,21 +801,21 @@
                     <tr>
                         <td>${term.name}</td>
                         <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${assignment}</td>
-                        <td class="grade-cell">${final}</td>
+                        <td class="grade-cell">${summaryAssignment}</td>
+                        <td class="grade-cell">${summaryFinal}</td>
                         <td class="grade-cell">${termTotal}</td>
                         <td class="grade-cell">${percentage}%</td>
                     </tr>
                 `;
 
                 totalAttendance += attendance;
-                totalAssignment += assignment;
-                totalFinal += final;
+                totalAssignment += summaryAssignment;
+                totalFinal += summaryFinal;
                 totalOverall += termTotal;
             });
 
             // حساب النسبة الإجمالية للسنة
-            const totalMaxGrades = 799; // 394 + 208 + 197
+            const totalMaxGrades = 770; // 380 + 200 + 190
             const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(1);
 
             // إضافة صف الإجمالي
@@ -850,3 +857,4 @@
     </script>
 </body>
 </html>
+
