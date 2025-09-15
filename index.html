@@ -623,7 +623,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    timeout: 10000
+                    timeout: 3000
                 });
                 
                 if (response.ok) {
@@ -636,38 +636,54 @@
             } catch (error) {
                 console.log(`Error fetching term ${termNumber} from server:`, error);
                 
-                // في حالة فشل الخادم، محاولة جلب البيانات من ملف JSON محلي
-                try {
-                    const jsonResponse = await fetch('students.json');
-                    if (jsonResponse.ok) {
-                        const studentsData = await jsonResponse.json();
-                        const student = studentsData.find(s => 
-                            s["الرقم القومي"].toString() === nationalID.toString()
-                        );
-                        
-                        if (student && student[`term${termNumber}`]) {
-                            return { 
-                                success: true, 
-                                data: {
-                                    ...student[`term${termNumber}`],
-                                    "الاسم": student["الاسم"],
-                                    "الكود": student["الكود"]
-                                }, 
-                                term: termNumber,
-                                source: 'json'
-                            };
-                        }
-                        
-                        return { 
-                            success: false, 
-                            term: termNumber, 
-                            error: 'not_found',
-                            hasStudentData: !!student
-                        };
+                async function fetchFromSheet() {
+                      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv"; // غيره بالرابط بتاعك
+                      const response = await fetch(url);
+                      const text = await response.text();
+
+                      const rows = text.split("\n").map(r => r.split(","));
+                      const headers = rows[0];
+                      const data = rows.slice(1).map(row => {
+                            let obj = {};
+                                      row.forEach((val, i) => {
+                                      obj[headers[i]] = val.trim();
+                      });
+                           return obj;
+                       });
+
+              return data;
                     }
-                } catch (jsonError) {
-                    console.log(`Error loading JSON file:`, jsonError);
-                }
+
+                // ⬇⬇ استعمال Google Sheets بدل JSON
+        try {
+            const studentsData = await fetchFromSheet();
+            const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
+
+            if (student) {
+                return { 
+                    success: true, 
+                    data: {
+                        "الاسم": student["الاسم"],
+                        "الكود": student["الكود"],
+                        "الحضور": student[`term${termNumber}-الحضور`] || 0,
+                        "الواجب": student[`term${termNumber}-الواجب`] || 0,
+                        "البحث": student[`term${termNumber}-البحث`] || 0,
+                        "الميدترم": student[`term${termNumber}-الميدترم`] || 0,
+                        "الفاينال": student[`term${termNumber}-الفاينال`] || 0
+                    }, 
+                    term: termNumber,
+                    source: 'sheet'
+                };
+            }
+
+            return { success: false, term: termNumber, error: 'not_found' };
+
+        } catch (sheetError) {
+            console.log(`Error fetching from Google Sheet:`, sheetError);
+            return { success: false, term: termNumber, error: 'connection_failed' };
+        }
+    }
+}
                 
                 return { 
                     success: false, 
@@ -941,3 +957,4 @@
     </script>
 </body>
 </html>
+
