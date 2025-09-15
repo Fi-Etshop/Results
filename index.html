@@ -589,110 +589,56 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // Maximum grades configuration
-        const maxGrades = {
-            term1: {
-                attendance: 14,
-                assignment: 280,
-                research: 10,
-                midterm: 40,
-                final: 50,
-                total: 380
-            },
-            term2: {
-                attendance: 8,
-                assignment: 150,
-                final: 50,
-                total: 200
-            },
-            term3: {
-                attendance: 7,
-                assignment: 140,
-                final: 50,
-                total: 190
-            }
-        };
+        // Google Sheets CSV URL - غير هذا الرابط برابطك
+        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv";
 
-        // دالة محسنة لجلب البيانات من JSON أو الخادم
-        async function fetchTermResults(nationalID, termNumber) {
+        // دالة جلب البيانات من Google Sheets
+        async function fetchStudentData() {
             try {
-                // محاولة جلب البيانات من الخادم أولاً
-                const response = await fetch(`https://74.249.193.181.nip.io/student/${nationalID}?term=${termNumber}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    timeout: 3000
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    return { success: true, data: data, term: termNumber, source: 'server' };
-                }
-                
-                throw new Error(`HTTP ${response.status}`);
-                
-            } catch (error) {
-                console.log(`Error fetching term ${termNumber} from server:`, error);
-                
-                async function fetchFromSheet() {
-                      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv"; // غيره بالرابط بتاعك
-                      const response = await fetch(url);
-                      const text = await response.text();
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+                const csvText = await response.text();
 
-                      const rows = text.split("\n").map(r => r.split(","));
-                      const headers = rows[0];
-                      const data = rows.slice(1).map(row => {
-                            let obj = {};
-                                      row.forEach((val, i) => {
-                                      obj[headers[i]] = val.trim();
-                      });
-                           return obj;
-                       });
-
-              return data;
+                // تحليل CSV
+                const rows = csvText.split("\n").map(row => {
+                    // التعامل مع الفواصل داخل الأقواس
+                    const cells = [];
+                    let currentCell = '';
+                    let insideQuotes = false;
+                    
+                    for (let i = 0; i < row.length; i++) {
+                        const char = row[i];
+                        if (char === '"') {
+                            insideQuotes = !insideQuotes;
+                        } else if (char === ',' && !insideQuotes) {
+                            cells.push(currentCell.trim());
+                            currentCell = '';
+                        } else {
+                            currentCell += char;
+                        }
                     }
+                    cells.push(currentCell.trim());
+                    return cells;
+                });
 
-                // ⬇⬇ استعمال Google Sheets بدل JSON
-        try {
-            const studentsData = await fetchFromSheet();
-            const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
+                const headers = rows[0];
+                const studentsData = rows.slice(1).map(row => {
+                    const student = {};
+                    row.forEach((value, index) => {
+                        if (headers[index]) {
+                            student[headers[index].trim()] = value.trim();
+                        }
+                    });
+                    return student;
+                }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
 
-            if (student) {
-                return { 
-                    success: true, 
-                    data: {
-                        "الاسم": student["الاسم"],
-                        "الكود": student["الكود"],
-                        "الحضور": student[`term${termNumber}-الحضور`] || 0,
-                        "الواجب": student[`term${termNumber}-الواجب`] || 0,
-                        "البحث": student[`term${termNumber}-البحث`] || 0,
-                        "الميدترم": student[`term${termNumber}-الميدترم`] || 0,
-                        "الفاينال": student[`term${termNumber}-الفاينال`] || 0
-                    }, 
-                    term: termNumber,
-                    source: 'sheet'
-                };
-            }
-
-            return { success: false, term: termNumber, error: 'not_found' };
-
-        } catch (sheetError) {
-            console.log(`Error fetching from Google Sheet:`, sheetError);
-            return { success: false, term: termNumber, error: 'connection_failed' };
-        }
-    }
-}
-                
-                return { 
-                    success: false, 
-                    term: termNumber, 
-                    error: 'connection_failed'
-                };
+                return studentsData;
+            } catch (error) {
+                console.error('Error fetching data from Google Sheets:', error);
+                throw error;
             }
         }
 
+        // دالة البحث عن الطالب
         async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
@@ -703,13 +649,14 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             const searchButton = document.getElementById('searchButton');
 
-            // Clear previous results
+            // مسح النتائج السابقة
             errorMessage.classList.add('hidden');
             successMessage.classList.add('hidden');
             resultsSection.classList.add('hidden');
             studentInfo.classList.add('hidden');
             quote.classList.add('hidden');
 
+            // التحقق من صحة المدخل
             if (!nationalID) {
                 showError("برجاء إدخال الرقم القومي");
                 return;
@@ -720,64 +667,45 @@
                 return;
             }
 
-            // Show loading spinner and disable button
+            // عرض مؤشر التحميل
             loadingSpinner.classList.remove('hidden');
             searchButton.disabled = true;
             searchButton.textContent = 'جاري البحث...';
 
             try {
-                // جلب نتائج الثلاث ترمات
-                const [term1Result, term2Result, term3Result] = await Promise.all([
-                    fetchTermResults(nationalID, 1),
-                    fetchTermResults(nationalID, 2),
-                    fetchTermResults(nationalID, 3)
-                ]);
+                // جلب بيانات الطلاب
+                const studentsData = await fetchStudentData();
+                
+                // البحث عن الطالب
+                const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
 
-                // Hide loading spinner and enable button
+                // إخفاء مؤشر التحميل
                 loadingSpinner.classList.add('hidden');
                 searchButton.disabled = false;
                 searchButton.textContent = 'البحث عن النتيجة';
 
-                // التحقق من وجود الطالب (في أي ترم)
-                const studentExists = term1Result.success || term2Result.success || term3Result.success || 
-                                   term1Result.hasStudentData || term2Result.hasStudentData || term3Result.hasStudentData;
-
-                if (!studentExists) {
+                if (!student) {
                     showError("الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة");
                     return;
                 }
 
-                // عرض معلومات الطالب من أول ترم متاح
-                const studentData = term1Result.data || term2Result.data || term3Result.data;
-                
-                if (studentData) {
-                    document.getElementById('studentName').textContent = studentData["الاسم"] || "غير محدد";
-                    document.getElementById('studentCode').textContent = studentData["الكود"] || "غير محدد";
-                    studentInfo.classList.remove('hidden');
-                }
+                // عرض معلومات الطالب
+                document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
+                document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
+                studentInfo.classList.remove('hidden');
 
                 // عرض نتائج كل ترم
-                displayTermResults(term1Result, 'term1Body', 1);
-                displayTermResults(term2Result, 'term2Body', 2);
-                displayTermResults(term3Result, 'term3Body', 3);
+                displayTermResults(student, 1);
+                displayTermResults(student, 2);
+                displayTermResults(student, 3);
 
                 // عرض الملخص
-                displaySummary(term1Result, term2Result, term3Result);
+                displaySummary(student);
 
                 resultsSection.classList.remove('hidden');
                 quote.classList.remove('hidden');
                 
-                // رسالة النجاح مع تفاصيل المصدر
-                const hasJsonData = [term1Result, term2Result, term3Result].some(r => r.source === 'json');
-                const hasServerData = [term1Result, term2Result, term3Result].some(r => r.source === 'server');
-                
-                let successMsg = "تم العثور على النتائج بنجاح!";
-                if (hasJsonData && !hasServerData) {
-                    successMsg += " (البيانات من الملف المحلي)";
-                } else if (hasJsonData && hasServerData) {
-                    successMsg += " (مزيج من البيانات المحلية والخادم)";
-                }
-                showSuccess(successMsg);
+                showSuccess("تم العثور على النتائج بنجاح!");
 
                 // Scroll to results
                 setTimeout(() => {
@@ -788,50 +716,41 @@
                 loadingSpinner.classList.add('hidden');
                 searchButton.disabled = false;
                 searchButton.textContent = 'البحث عن النتيجة';
-                showError("حدث خطأ في الاتصال. برجاء المحاولة مرة أخرى");
+                showError("حدث خطأ في الاتصال بقاعدة البيانات. برجاء المحاولة مرة أخرى");
                 console.error('Error:', error);
             }
         }
 
-        // دالة العرض المحسنة
-        function displayTermResults(termResult, bodyId, termNumber) {
-            const tbody = document.getElementById(bodyId);
+        // دالة عرض نتائج الترم
+        function displayTermResults(student, termNumber) {
+            const tbody = document.getElementById(`term${termNumber}Body`);
             
-            // إذا لم تكن هناك بيانات، عرض رسالة
-            if (!termResult.success) {
-                const colspan = termNumber === 1 ? 5 : 3;
-                let message = "لا توجد نتائج متاحة لهذا الترم";
-                
-                if (termResult.error === 'connection_failed') {
-                    message = "خطأ في الاتصال بالخادم وملف البيانات";
-                } else if (termResult.error === 'not_found') {
-                    message = "لا توجد نتائج لهذا الترم حتى الآن";
-                }
-                
-                tbody.innerHTML = `<tr class="no-data-row"><td colspan="${colspan}">${message}</td></tr>`;
-                return;
-            }
-            
-            // عرض البيانات المتاحة
-            const data = termResult.data;
+            // الحصول على درجات الترم
+            const attendance = parseFloat(student[`term${termNumber}_attendance`] || student[`الترم${termNumber}_الحضور`] || 0);
+            const assignment = parseFloat(student[`term${termNumber}_assignment`] || student[`الترم${termNumber}_الواجب`] || 0);
+            const final = parseFloat(student[`term${termNumber}_final`] || student[`الترم${termNumber}_الفاينال`] || 0);
+
             let html = '';
 
             if (termNumber === 1) {
+                const research = parseFloat(student[`term${termNumber}_research`] || student[`الترم${termNumber}_البحث`] || 0);
+                const midterm = parseFloat(student[`term${termNumber}_midterm`] || student[`الترم${termNumber}_الميدترم`] || 0);
+                
                 html = `
                     <tr>
-                        <td class="grade-cell">${data["الحضور"] || 0}</td>
-                        <td class="grade-cell">${data["الواجب"] || 0}</td>
-                        <td class="grade-cell">${data["البحث"] || 0}</td>
-                        <td class="grade-cell">${data["الميدترم"] || 0}</td>
-                        <td class="grade-cell">${data["الفاينال"] || 0}</td>
+                        <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${assignment}</td>
+                        <td class="grade-cell">${research}</td>
+                        <td class="grade-cell">${midterm}</td>
+                        <td class="grade-cell">${final}</td>
                     </tr>
                 `;
             } else {
                 html = `
                     <tr>
-                        <td class="grade-cell">${data["الحضور"] || 0}</td>
-                        <td class="grade-cell">${data["الواجب"] || 0}</td>
-                        <td class="grade-cell">${data["الفاينال"] || 0}</td>
+                        <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${assignment}</td>
+                        <td class="grade-cell">${final}</td>
                     </tr>
                 `;
             }
@@ -839,96 +758,70 @@
             tbody.innerHTML = html;
         }
 
-        function displaySummary(term1, term2, term3) {
+        // دالة عرض الملخص
+        function displaySummary(student) {
             const summaryBody = document.getElementById('summaryBody');
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', data: term1, maxTotal: 380 },
-                { name: 'الترم الثاني', data: term2, maxTotal: 200 },
-                { name: 'الترم الثالث', data: term3, maxTotal: 190 }
+                { name: 'الترم الأول', number: 1, maxTotal: 394 }, // 14+280+10+40+50
+                { name: 'الترم الثاني', number: 2, maxTotal: 208 }, // 8+150+50
+                { name: 'الترم الثالث', number: 3, maxTotal: 197 }  // 7+140+50
             ];
 
             let totalAttendance = 0;
-            let totalAssignmentResearch = 0;
-            let totalMidtermFinal = 0;
+            let totalAssignment = 0;
+            let totalFinal = 0;
             let totalOverall = 0;
 
             terms.forEach(term => {
-                if (term.data.success && term.data.data) {
-                    const data = term.data.data;
-                    const termNum = term.data.term;
-                    
-                    let attendance, assignmentResearch, midtermFinal, termTotal, percentage;
-                    
-                    if (termNum === 1) {
-                        attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
-                        const research = data["البحث"] || 0;
-                        const midterm = data["الميدترم"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        
-                        assignmentResearch = assignment + research;
-                        midtermFinal = midterm + finalExam;
-                        termTotal = assignmentResearch + midtermFinal;
-                    } else {
-                        attendance = data["الحضور"] || 0;
-                        const assignment = data["الواجب"] || 0;
-                        const finalExam = data["الفاينال"] || 0;
-                        
-                        assignmentResearch = assignment;
-                        midtermFinal = finalExam;
-                        termTotal = assignmentResearch + midtermFinal;
-                    }
-
-                    percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
-
-                    summaryHTML += `
-                        <tr>
-                            <td>${term.name}</td>
-                            <td class="grade-cell">${attendance}</td>
-                            <td class="grade-cell">${assignmentResearch}</td>
-                            <td class="grade-cell">${midtermFinal}</td>
-                            <td class="grade-cell">${termTotal}</td>
-                            <td class="grade-cell">${percentage}%</td>
-                        </tr>
-                    `;
-
-                    totalAttendance += attendance;
-                    totalAssignmentResearch += assignmentResearch;
-                    totalMidtermFinal += midtermFinal;
-                    totalOverall += termTotal;
+                const attendance = parseFloat(student[`term${term.number}_attendance`] || student[`الترم${term.number}_الحضور`] || 0);
+                const assignment = parseFloat(student[`term${term.number}_assignment`] || student[`الترم${term.number}_الواجب`] || 0);
+                const final = parseFloat(student[`term${term.number}_final`] || student[`الترم${term.number}_الفاينال`] || 0);
+                
+                let termTotal;
+                if (term.number === 1) {
+                    const research = parseFloat(student[`term${term.number}_research`] || student[`الترم${term.number}_البحث`] || 0);
+                    const midterm = parseFloat(student[`term${term.number}_midterm`] || student[`الترم${term.number}_الميدترم`] || 0);
+                    termTotal = attendance + assignment + research + midterm + final;
                 } else {
-                    summaryHTML += `
-                        <tr class="no-data-row">
-                            <td>${term.name}</td>
-                            <td colspan="5">لا توجد نتائج</td>
-                        </tr>
-                    `;
+                    termTotal = attendance + assignment + final;
                 }
-            });
 
-            // حساب النسبة الإجمالية للسنة (على أساس الحد الأقصى للترمات المتاحة)
-            let totalMaxGrades = 0;
-            if (term1.success) totalMaxGrades += 380;
-            if (term2.success) totalMaxGrades += 200;
-            if (term3.success) totalMaxGrades += 190;
+                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(1);
 
-            const overallPercentage = totalMaxGrades > 0 ? ((totalOverall / 770) * 100).toFixed(1) : '0.0';
-
-            // إضافة صف الإجمالي فقط إذا كان هناك نتائج متاحة
-            if (totalOverall > 0) {
                 summaryHTML += `
-                    <tr class="total-row">
-                        <td>إجمالي السنة</td>
-                        <td class="grade-cell">${totalAttendance}</td>
-                        <td class="grade-cell">${totalAssignmentResearch}</td>
-                        <td class="grade-cell">${totalMidtermFinal}</td>
-                        <td class="grade-cell">${totalOverall}</td>
-                        <td class="grade-cell">${overallPercentage}%</td>
+                    <tr>
+                        <td>${term.name}</td>
+                        <td class="grade-cell">${attendance}</td>
+                        <td class="grade-cell">${assignment}</td>
+                        <td class="grade-cell">${final}</td>
+                        <td class="grade-cell">${termTotal}</td>
+                        <td class="grade-cell">${percentage}%</td>
                     </tr>
                 `;
-            }
+
+                totalAttendance += attendance;
+                totalAssignment += assignment;
+                totalFinal += final;
+                totalOverall += termTotal;
+            });
+
+            // حساب النسبة الإجمالية للسنة
+            const totalMaxGrades = 799; // 394 + 208 + 197
+            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(1);
+
+            // إضافة صف الإجمالي
+            summaryHTML += `
+                <tr class="total-row">
+                    <td>إجمالي السنة</td>
+                    <td class="grade-cell">${totalAttendance}</td>
+                    <td class="grade-cell">${totalAssignment}</td>
+                    <td class="grade-cell">${totalFinal}</td>
+                    <td class="grade-cell">${totalOverall}</td>
+                    <td class="grade-cell">${overallPercentage}%</td>
+                </tr>
+            `;
 
             summaryBody.innerHTML = summaryHTML;
         }
@@ -938,7 +831,7 @@
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
             
-            // Hide error message after 5 seconds
+            // إخفاء رسالة الخطأ بعد 5 ثواني
             setTimeout(() => {
                 errorMessage.classList.add('hidden');
             }, 5000);
@@ -949,7 +842,7 @@
             successMessage.textContent = message;
             successMessage.classList.remove('hidden');
             
-            // Hide success message after 3 seconds
+            // إخفاء رسالة النجاح بعد 3 ثواني
             setTimeout(() => {
                 successMessage.classList.add('hidden');
             }, 3000);
@@ -957,4 +850,3 @@
     </script>
 </body>
 </html>
-
