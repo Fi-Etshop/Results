@@ -563,7 +563,6 @@
                         <th>إجمالي الحضور</th>
                         <th>إجمالي الواجب</th>
                         <th>إجمالي الفاينال</th>
-                        <th>إجمالي الترم</th>
                         <th>النسبة المئوية</th>
                         <th>التقدير</th>
                     </tr>
@@ -843,9 +842,9 @@
                 summaryHTML += `
                     <tr>
                         <td>${term.name}</td>
-                        <td class="grade-cell">${termAttendancePerc.toFixed(1)}%</td>
-                        <td class="grade-cell">${termAssignmentPerc.toFixed(1)}%</td>
-                        <td class="grade-cell">${termFinalPerc.toFixed(1)}%</td>
+                        <td class="grade-cell">${termAttendancePerc.toFixed(2)}%</td>
+                        <td class="grade-cell">${termAssignmentPerc.toFixed(2)}%</td>
+                        <td class="grade-cell">${termFinalPerc.toFixed(2)}%</td>
                         <td class="grade-cell">-</td>
                         <td class="grade-cell">${weightedPercentage}%</td>
                         <td class="grade-cell ${grade.class}">${grade.text}</td>
@@ -875,9 +874,9 @@
             summaryHTML += `
                 <tr class="total-row">
                     <td>إجمالي السنة</td>
-                    <td class="grade-cell">${avgAttendancePerc.toFixed(1)}%</td>
-                    <td class="grade-cell">${avgAssignmentPerc.toFixed(1)}%</td>
-                    <td class="grade-cell">${avgFinalPerc.toFixed(1)}%</td>
+                    <td class="grade-cell">${avgAttendancePerc.toFixed(2)}%</td>
+                    <td class="grade-cell">${avgAssignmentPerc.toFixed(2)}%</td>
+                    <td class="grade-cell">${avgFinalPerc.toFixed(2)}%</td>
                     <td class="grade-cell">-</td>
                     <td class="grade-cell">${overallWeightedPercentage}%</td>
                     <td class="grade-cell ${overallGrade.class}">${overallGrade.text}</td>
@@ -911,6 +910,7 @@
     </script>
 </body>
 </html>
+
 
 
 
