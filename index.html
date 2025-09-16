@@ -589,54 +589,8 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // Google Sheets CSV URL - غير هذا الرابط برابطك
-        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv";
-
-        // دالة جلب البيانات من Google Sheets
-        async function fetchStudentData() {
-            try {
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-                const csvText = await response.text();
-
-                // تحليل CSV
-                const rows = csvText.split("\n").map(row => {
-                    // التعامل مع الفواصل داخل الأقواس
-                    const cells = [];
-                    let currentCell = '';
-                    let insideQuotes = false;
-                    
-                    for (let i = 0; i < row.length; i++) {
-                        const char = row[i];
-                        if (char === '"') {
-                            insideQuotes = !insideQuotes;
-                        } else if (char === ',' && !insideQuotes) {
-                            cells.push(currentCell.trim());
-                            currentCell = '';
-                        } else {
-                            currentCell += char;
-                        }
-                    }
-                    cells.push(currentCell.trim());
-                    return cells;
-                });
-
-                const headers = rows[0];
-                const studentsData = rows.slice(1).map(row => {
-                    const student = {};
-                    row.forEach((value, index) => {
-                        if (headers[index]) {
-                            student[headers[index].trim()] = value.trim();
-                        }
-                    });
-                    return student;
-                }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
-
-                return studentsData;
-            } catch (error) {
-                console.error('Error fetching data from Google Sheets:', error);
-                throw error;
-            }
-        }
+        // Google Apps Script Web App URL - ضع هنا رابط الـ Web App الخاص بك
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySubkWL0sidOAzytLZPy-YBNc47b2QCQtbqCLXR0lxJQ2H23kcqH1myHkG2sySqbPZUA/exec";
 
         // دالة البحث عن الطالب
         async function searchGrades() {
@@ -673,12 +627,20 @@
             searchButton.textContent = 'جاري البحث...';
 
             try {
-                // جلب بيانات الطلاب
-                const studentsData = await fetchStudentData();
-                
-                // البحث عن الطالب
-                const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
+                // إرسال طلب إلى Google Apps Script
+                const response = await fetch(https://script.google.com/macros/s/AKfycbySubkWL0sidOAzytLZPy-YBNc47b2QCQtbqCLXR0lxJQ2H23kcqH1myHkG2sySqbPZUA/exec, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'getStudentGrades',
+                        nationalID: nationalID
+                    })
+                });
 
+                const result = await response.json();
+            
                 // إخفاء مؤشر التحميل
                 loadingSpinner.classList.add('hidden');
                 searchButton.disabled = false;
@@ -933,4 +895,5 @@
     </script>
 </body>
 </html>
+
 
