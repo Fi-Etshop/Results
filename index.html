@@ -780,22 +780,39 @@
             let summaryHTML = '';
 
             const terms = [
-                { name: 'الترم الأول', number: 1, maxTotal: 380 }, // 280+10+40+50 (بدون الحضور)
-                { name: 'الترم الثاني', number: 2, maxTotal: 200 }, // 150+50 (بدون الحضور)
-                { name: 'الترم الثالث', number: 3, maxTotal: 190 }  // 140+50 (بدون الحضور)
+                { 
+                    name: 'الترم الأول', 
+                    number: 1, 
+                    maxAttendance: 14,
+                    maxAssignment: 290, // 280 + 10 (الواجب + البحث)
+                    maxFinal: 90 // 40 + 50 (الميدترم + الفاينال)
+                },
+                { 
+                    name: 'الترم الثاني', 
+                    number: 2, 
+                    maxAttendance: 8,
+                    maxAssignment: 150,
+                    maxFinal: 50
+                },
+                { 
+                    name: 'الترم الثالث', 
+                    number: 3, 
+                    maxAttendance: 7,
+                    maxAssignment: 140,
+                    maxFinal: 50
+                }
             ];
 
-            let totalAttendance = 0;
-            let totalAssignment = 0;
-            let totalFinal = 0;
-            let totalOverall = 0;
+            let attendancePercentageSum = 0;
+            let assignmentPercentageSum = 0;
+            let finalPercentageSum = 0;
 
             terms.forEach(term => {
                 const attendance = parseFloat(student[`term${term.number}_attendance`] || student[`الترم${term.number}_الحضور`] || 0);
                 const assignment = parseFloat(student[`term${term.number}_assignment`] || student[`الترم${term.number}_الواجب`] || 0);
                 const final = parseFloat(student[`term${term.number}_final`] || student[`الترم${term.number}_الفاينال`] || 0);
                 
-                let summaryAssignment, summaryFinal, termTotal;
+                let summaryAssignment, summaryFinal, termAttendancePerc, termAssignmentPerc, termFinalPerc;
                 
                 if (term.number === 1) {
                     const research = parseFloat(student[`term${term.number}_research`] || student[`الترم${term.number}_البحث`] || 0);
@@ -804,48 +821,65 @@
                     // للترم الأول: إجمالي الواجب = الواجب + البحث، إجمالي الفاينال = الميدترم + الفاينال
                     summaryAssignment = assignment + research;
                     summaryFinal = midterm + final;
-                    termTotal = assignment + research + midterm + final; // بدون الحضور
                 } else {
                     summaryAssignment = assignment;
                     summaryFinal = final;
-                    termTotal = assignment + final; // بدون الحضور
                 }
 
-                const percentage = ((termTotal / term.maxTotal) * 100).toFixed(2);
-                const grade = getGrade(parseFloat(percentage));
+                // حساب النسبة المئوية لكل عنصر
+                termAttendancePerc = ((attendance / term.maxAttendance) * 100);
+                termAssignmentPerc = ((summaryAssignment / term.maxAssignment) * 100);
+                termFinalPerc = ((summaryFinal / term.maxFinal) * 100);
+
+                // تطبيق الأوزان الجديدة: 25% حضور + 35% واجب + 40% فاينال
+                const weightedPercentage = (
+                    (termAttendancePerc * 0.25) + 
+                    (termAssignmentPerc * 0.35) + 
+                    (termFinalPerc * 0.40)
+                ).toFixed(2);
+                
+                const grade = getGrade(parseFloat(weightedPercentage));
 
                 summaryHTML += `
                     <tr>
                         <td>${term.name}</td>
-                        <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${summaryAssignment}</td>
-                        <td class="grade-cell">${summaryFinal}</td>
-                        <td class="grade-cell">${termTotal}</td>
-                        <td class="grade-cell">${percentage}%</td>
+                        <td class="grade-cell">${termAttendancePerc.toFixed(1)}%</td>
+                        <td class="grade-cell">${termAssignmentPerc.toFixed(1)}%</td>
+                        <td class="grade-cell">${termFinalPerc.toFixed(1)}%</td>
+                        <td class="grade-cell">-</td>
+                        <td class="grade-cell">${weightedPercentage}%</td>
                         <td class="grade-cell ${grade.class}">${grade.text}</td>
                     </tr>
                 `;
 
-                totalAttendance += attendance;
-                totalAssignment += summaryAssignment;
-                totalFinal += summaryFinal;
-                totalOverall += termTotal;
+                attendancePercentageSum += termAttendancePerc;
+                assignmentPercentageSum += termAssignmentPerc;
+                finalPercentageSum += termFinalPerc;
             });
 
-            // حساب النسبة الإجمالية للسنة
-            const totalMaxGrades = 770; // 380 + 200 + 190
-            const overallPercentage = ((totalOverall / totalMaxGrades) * 100).toFixed(2);
-            const overallGrade = getGrade(parseFloat(overallPercentage));
+            // حساب المتوسط للسنة
+            const avgAttendancePerc = (attendancePercentageSum / 3);
+            const avgAssignmentPerc = (assignmentPercentageSum / 3);
+            const avgFinalPerc = (finalPercentageSum / 3);
+
+            // تطبيق الأوزان على المتوسط السنوي
+            const overallWeightedPercentage = (
+                (avgAttendancePerc * 0.25) + 
+                (avgAssignmentPerc * 0.35) + 
+                (avgFinalPerc * 0.40)
+            ).toFixed(2);
+            
+            const overallGrade = getGrade(parseFloat(overallWeightedPercentage));
 
             // إضافة صف الإجمالي
             summaryHTML += `
                 <tr class="total-row">
                     <td>إجمالي السنة</td>
-                    <td class="grade-cell">${totalAttendance}</td>
-                    <td class="grade-cell">${totalAssignment}</td>
-                    <td class="grade-cell">${totalFinal}</td>
-                    <td class="grade-cell">${totalOverall}</td>
-                    <td class="grade-cell">${overallPercentage}%</td>
+                    <td class="grade-cell">${avgAttendancePerc.toFixed(1)}%</td>
+                    <td class="grade-cell">${avgAssignmentPerc.toFixed(1)}%</td>
+                    <td class="grade-cell">${avgFinalPerc.toFixed(1)}%</td>
+                    <td class="grade-cell">-</td>
+                    <td class="grade-cell">${overallWeightedPercentage}%</td>
                     <td class="grade-cell ${overallGrade.class}">${overallGrade.text}</td>
                 </tr>
             `;
@@ -877,6 +911,7 @@
     </script>
 </body>
 </html>
+
 
 
 
