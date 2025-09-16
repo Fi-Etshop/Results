@@ -689,6 +689,13 @@
                     return;
                 }
 
+                // التحقق من حالة دفع المصاريف
+                const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
+                if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
+                    showPaymentError();
+                    return;
+                }
+
                 // عرض معلومات الطالب
                 document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
                 document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
@@ -904,6 +911,24 @@
             setTimeout(() => {
                 successMessage.classList.add('hidden');
             }, 3000);
+        }
+
+        function showPaymentError() {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #d32f2f; margin-top: 0;">⚠️ تنبيه مهم</h3>
+                    <p style="font-size: 16px; margin: 15px 0;">عذراً، لا يمكن عرض النتيجة حالياً</p>
+                    <p style="font-size: 14px; color: #666;">برجاء مراجعة الإدارة لاستكمال المصاريف الدراسية</p>
+                    <div style="margin-top: 20px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+                        <p style="margin: 0; font-size: 13px; color: #856404;">
+                            📞 للاستفسار: اتصل بالإدارة<br>
+                            📍 أو قم بزيارة المعهد لتسوية المصاريف
+                        </p>
+                    </div>
+                </div>
+            `;
+            errorMessage.classList.remove('hidden');
         }
     </script>
 </body>
