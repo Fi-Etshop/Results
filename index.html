@@ -563,7 +563,6 @@
                         <th>نسبة الحضور</th>
                         <th>نسبة الواجب</th>
                         <th>نسبة الفاينال</th>
-                        <th>نسبة المجموع</th>
                         <th>النسبة المئوية</th>
                         <th>التقدير</th>
                     </tr>
@@ -774,7 +773,7 @@
             }
         }
 
-        // دالة عرض الملخص
+        // دالة عرض الملخص (بدون عمود نسبة المجموع)
         function displaySummary(student) {
             const summaryBody = document.getElementById('summaryBody');
             let summaryHTML = '';
@@ -846,7 +845,6 @@
                         <td class="grade-cell">${termAttendancePerc.toFixed(2)}%</td>
                         <td class="grade-cell">${termAssignmentPerc.toFixed(2)}%</td>
                         <td class="grade-cell">${termFinalPerc.toFixed(2)}%</td>
-                        <td class="grade-cell">-</td>
                         <td class="grade-cell">${weightedPercentage}%</td>
                         <td class="grade-cell ${grade.class}">${grade.text}</td>
                     </tr>
@@ -878,7 +876,6 @@
                     <td class="grade-cell">${avgAttendancePerc.toFixed(2)}%</td>
                     <td class="grade-cell">${avgAssignmentPerc.toFixed(2)}%</td>
                     <td class="grade-cell">${avgFinalPerc.toFixed(2)}%</td>
-                    <td class="grade-cell">-</td>
                     <td class="grade-cell">${overallWeightedPercentage}%</td>
                     <td class="grade-cell ${overallGrade.class}">${overallGrade.text}</td>
                 </tr>
@@ -911,10 +908,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
