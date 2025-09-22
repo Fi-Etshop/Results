@@ -638,95 +638,97 @@
             }
         }
 
-        // دالة البحث عن الطالب
-        async function searchGrades() {
-            const nationalID = document.getElementById('nationalID').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
-            const resultsSection = document.getElementById('resultsSection');
-            const studentInfo = document.getElementById('studentInfo');
-            const quote = document.getElementById('quote');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const searchButton = document.getElementById('searchButton');
+        // رابط Google Apps Script API (استبدله برابطك)
+const API_URL = "https://script.google.com/macros/s/AKfycby7MjSO5zRqW_dF8BaX5tLonuDBXCCOEYtD0gTNZddYI6dsZmxmP71nq84RReVmwaXFbA/exec";
 
-            // مسح النتائج السابقة
-            errorMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            studentInfo.classList.add('hidden');
-            quote.classList.add('hidden');
+async function searchGrades() {
+    const nationalID = document.getElementById('nationalID').value.trim();
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const resultsSection = document.getElementById('resultsSection');
+    const studentInfo = document.getElementById('studentInfo');
+    const quote = document.getElementById('quote');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const searchButton = document.getElementById('searchButton');
 
-            // التحقق من صحة المدخل
-            if (!nationalID) {
-                showError("برجاء إدخال الرقم القومي");
-                return;
-            }
+    // مسح النتائج السابقة
+    errorMessage.classList.add('hidden');
+    successMessage.classList.add('hidden');
+    resultsSection.classList.add('hidden');
+    studentInfo.classList.add('hidden');
+    quote.classList.add('hidden');
 
-            if (nationalID.length !== 14) {
-                showError("الرقم القومي يجب أن يكون 14 رقم");
-                return;
-            }
+    // التحقق من صحة المدخل
+    if (!nationalID) {
+        showError("برجاء إدخال الرقم القومي");
+        return;
+    }
 
-            // عرض مؤشر التحميل
-            loadingSpinner.classList.remove('hidden');
-            searchButton.disabled = true;
-            searchButton.textContent = 'جاري البحث...';
+    if (nationalID.length !== 14) {
+        showError("الرقم القومي يجب أن يكون 14 رقم");
+        return;
+    }
 
-            try {
-                // جلب بيانات الطلاب
-                const studentsData = await fetchStudentData();
-                
-                // البحث عن الطالب
-                const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
+    // عرض مؤشر التحميل
+    loadingSpinner.classList.remove('hidden');
+    searchButton.disabled = true;
+    searchButton.textContent = 'جاري البحث...';
 
-                // إخفاء مؤشر التحميل
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
+    try {
+        // طلب البيانات من API
+        const response = await fetch(`${API_URL}?nationalId=${nationalID}`);
+        const result = await response.json();
 
-                if (!student) {
-                    showError("الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة");
-                    return;
-                }
+        // إخفاء مؤشر التحميل
+        loadingSpinner.classList.add('hidden');
+        searchButton.disabled = false;
+        searchButton.textContent = 'البحث عن النتيجة';
 
-                // التحقق من حالة دفع المصاريف
-                const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
-                if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
-                    showPaymentError();
-                    return;
-                }
-
-                // عرض معلومات الطالب
-                document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
-                document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
-                studentInfo.classList.remove('hidden');
-
-                // عرض نتائج كل ترم
-                displayTermResults(student, 1);
-                displayTermResults(student, 2);
-                displayTermResults(student, 3);
-
-                // عرض الملخص
-                displaySummary(student);
-
-                resultsSection.classList.remove('hidden');
-                quote.classList.remove('hidden');
-                
-                showSuccess("تم العثور على النتائج بنجاح!");
-
-                // Scroll to results
-                setTimeout(() => {
-                    studentInfo.scrollIntoView({ behavior: 'smooth' });
-                }, 500);
-
-            } catch (error) {
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
-                showError("حدث خطأ في الاتصال بقاعدة البيانات. برجاء المحاولة مرة أخرى");
-                console.error('Error:', error);
-            }
+        if (result.error) {
+            showError(result.message);
+            return;
         }
+
+        const student = result.data;
+
+        // التحقق من حالة دفع المصاريف
+        const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
+        if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
+            showPaymentError();
+            return;
+        }
+
+        // عرض معلومات الطالب
+        document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
+        document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
+        studentInfo.classList.remove('hidden');
+
+        // عرض نتائج كل ترم
+        displayTermResults(student, 1);
+        displayTermResults(student, 2);
+        displayTermResults(student, 3);
+
+        // عرض الملخص
+        displaySummary(student);
+
+        resultsSection.classList.remove('hidden');
+        quote.classList.remove('hidden');
+        
+        showSuccess("تم العثور على النتائج بنجاح!");
+
+        // Scroll to results
+        setTimeout(() => {
+            studentInfo.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+
+    } catch (error) {
+        loadingSpinner.classList.add('hidden');
+        searchButton.disabled = false;
+        searchButton.textContent = 'البحث عن النتيجة';
+        showError("حدث خطأ في الاتصال بقاعدة البيانات. برجاء المحاولة مرة أخرى");
+        console.error('Error:', error);
+    }
+}
 
         // دالة عرض نتائج الترم
         function displayTermResults(student, termNumber) {
@@ -933,4 +935,5 @@
     </script>
 </body>
 </html>
+
 
