@@ -619,13 +619,13 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // Google Sheets CSV URL - غير هذا الرابط برابطك
-        const GOOGLE_SHEETS_CSV_URL = "https://shorturl.at/IPomD";
+        
+        const DATA = "https://shorturl.at/IPomD";
 
         // دالة جلب البيانات من Google Sheets
         async function fetchStudentData() {
             try {
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+                const response = await fetch(DATA);
                 const csvText = await response.text();
 
                 // تحليل CSV
@@ -963,6 +963,7 @@
     </script>
 </body>
 </html>
+
 
 
 
