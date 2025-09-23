@@ -620,12 +620,12 @@
         });
 
         
-        const DATA = "https://shorturl.at/IPomD";
+        const GOOGLE_SHEETS_CSV_URL = "https://shorturl.at/IPomD";
 
         // دالة جلب البيانات من Google Sheets
         async function fetchStudentData() {
             try {
-                const response = await fetch(DATA);
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
                 const csvText = await response.text();
 
                 // تحليل CSV
@@ -963,6 +963,7 @@
     </script>
 </body>
 </html>
+
 
 
 
