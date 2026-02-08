@@ -215,14 +215,6 @@
             background: linear-gradient(135deg, #2e7d32, #4caf50);
         }
         
-        .term2-header {
-            background: linear-gradient(135deg, #1976d2, #2196f3);
-        }
-        
-        .term3-header {
-            background: linear-gradient(135deg, #f57c00, #ff9800);
-        }
-        
         .summary-header {
             background: linear-gradient(135deg, #752214, #a03428);
         }
@@ -358,6 +350,12 @@
             border: 1px solid #f57c00;
             font-size: 0.9rem;
         }
+
+        .grade-excellent { color: #2e7d32; }
+        .grade-very-good { color: #1976d2; }
+        .grade-good { color: #f57c00; }
+        .grade-acceptable { color: #7b1fa2; }
+        .grade-fail { color: #d32f2f; }
         
         /* Mobile specific styles */
         @media (max-width: 768px) {
@@ -451,10 +449,11 @@
             }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <img src="logo.png" alt="شعار المعهد" class="logo" onerror="this.style.display='none'">
-    <h1>نتيجة السنة الأولى</h1>
+    <h1>نتيجة الترم الأول</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
@@ -470,11 +469,12 @@
         <h3>معلومات الطالب</h3>
         <p><strong>الاسم:</strong> <span id="studentName"></span></p>
         <p><strong>الكود:</strong> <span id="studentCode"></span></p>
+        <p><strong>الدفعة:</strong> <span id="studentBatch"></span></p>
     </div>
 
     <div id="resultsSection" class="results-section hidden">
-        <!-- الترم الأول -->
-        <h2>نتيجة الترم الأول</h2>
+        <!-- درجات الترم الأول -->
+        <h2>درجات الترم الأول</h2>
         <div class="table-container">
             <table id="term1Table">
                 <thead>
@@ -505,61 +505,12 @@
             </table>
         </div>
 
-        <!-- الترم الثاني -->
-        <h2>نتيجة الترم الثاني</h2>
-        <div class="table-container">
-            <table id="term2Table">
-                <thead>
-                    <tr class="term2-header">
-                        <th class="grade-header">
-                            <span class="header-title">الحضور</span>
-                            <span class="max-grade">8</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الواجب</span>
-                            <span class="max-grade">150</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الفاينال</span>
-                            <span class="max-grade">50</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="term2Body"></tbody>
-            </table>
-        </div>
-
-        <!-- الترم الثالث -->
-        <h2>نتيجة الترم الثالث</h2>
-        <div class="table-container">
-            <table id="term3Table">
-                <thead>
-                    <tr class="term3-header">
-                        <th class="grade-header">
-                            <span class="header-title">الحضور</span>
-                            <span class="max-grade">7</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الواجب</span>
-                            <span class="max-grade">140</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الفاينال</span>
-                            <span class="max-grade">50</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="term3Body"></tbody>
-            </table>
-        </div>
-
-        <!-- ملخص السنة -->
-        <h2>ملخص السنة الأولى</h2>
+        <!-- ملخص الترم الأول -->
+        <h2>ملخص الترم الأول</h2>
         <div class="table-container">
             <table id="summaryTable">
                 <thead>
                     <tr class="summary-header">
-                        <th>الترم</th>
                         <th>نسبة الحضور</th>
                         <th>نسبة الواجب</th>
                         <th>نسبة الفاينال</th>
@@ -579,58 +530,47 @@
     <script>
         // حماية بسيطة من فتح أدوات المطورين
         document.addEventListener('keydown', function(e) {
-            // منع F12
             if (e.keyCode === 123) {
                 e.preventDefault();
                 return false;
             }
-            // منع Ctrl+Shift+I
             if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
                 e.preventDefault();
                 return false;
             }
-            // منع Ctrl+Shift+J
             if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
                 e.preventDefault();
                 return false;
             }
-            // منع Ctrl+U
             if (e.ctrlKey && e.keyCode === 85) {
                 e.preventDefault();
                 return false;
             }
         });
 
-        // منع النقر بالزر الأيمن
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         });
         
-        // Add Enter key support for input
         document.getElementById('nationalID').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 searchGrades();
             }
         });
 
-        // Input validation - only numbers
         document.getElementById('nationalID').addEventListener('input', function(event) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // Google Sheets CSV URL - غير هذا الرابط برابطك
         const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7cVER4aZSY2w5PdMne0GJcOxYe1qMFoZfZCGTQ5GidPga8zjswK3_MGQtPo4hNEThMCAwGWDPntjK/pub?gid=0&single=true&output=csv";
 
-        // دالة جلب البيانات من Google Sheets
         async function fetchStudentData() {
             try {
                 const response = await fetch(GOOGLE_SHEETS_CSV_URL);
                 const csvText = await response.text();
 
-                // تحليل CSV
                 const rows = csvText.split("\n").map(row => {
-                    // التعامل مع الفواصل داخل الأقواس
                     const cells = [];
                     let currentCell = '';
                     let insideQuotes = false;
@@ -659,7 +599,7 @@
                         }
                     });
                     return student;
-                }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
+                }).filter(student => student["الرقم القومي"]);
 
                 return studentsData;
             } catch (error) {
@@ -668,7 +608,6 @@
             }
         }
 
-        // دالة البحث عن الطالب
         async function searchGrades() {
             const nationalID = document.getElementById('nationalID').value.trim();
             const errorMessage = document.getElementById('errorMessage');
@@ -679,14 +618,12 @@
             const loadingSpinner = document.getElementById('loadingSpinner');
             const searchButton = document.getElementById('searchButton');
 
-            // مسح النتائج السابقة
             errorMessage.classList.add('hidden');
             successMessage.classList.add('hidden');
             resultsSection.classList.add('hidden');
             studentInfo.classList.add('hidden');
             quote.classList.add('hidden');
 
-            // التحقق من صحة المدخل
             if (!nationalID) {
                 showError("برجاء إدخال الرقم القومي");
                 return;
@@ -697,19 +634,14 @@
                 return;
             }
 
-            // عرض مؤشر التحميل
             loadingSpinner.classList.remove('hidden');
             searchButton.disabled = true;
             searchButton.textContent = 'جاري البحث...';
 
             try {
-                // جلب بيانات الطلاب
                 const studentsData = await fetchStudentData();
-                
-                // البحث عن الطالب
                 const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
 
-                // إخفاء مؤشر التحميل
                 loadingSpinner.classList.add('hidden');
                 searchButton.disabled = false;
                 searchButton.textContent = 'البحث عن النتيجة';
@@ -719,32 +651,26 @@
                     return;
                 }
 
-                // التحقق من حالة دفع المصاريف
                 const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
                 if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
                     showPaymentError();
                     return;
                 }
 
-                // عرض معلومات الطالب
+                // عرض معلومات الطالب (مع إضافة الدفعة)
                 document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
                 document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
+                document.getElementById('studentBatch').textContent = student["الدفعة"] || student["batch"] || "غير محدد";
                 studentInfo.classList.remove('hidden');
 
-                // عرض نتائج كل ترم
-                displayTermResults(student, 1);
-                displayTermResults(student, 2);
-                displayTermResults(student, 3);
-
-                // عرض الملخص
-                displaySummary(student);
+                // عرض نتائج الترم الأول فقط
+                displayTerm1Results(student);
 
                 resultsSection.classList.remove('hidden');
                 quote.classList.remove('hidden');
                 
                 showSuccess("تم العثور على النتائج بنجاح!");
 
-                // Scroll to results
                 setTimeout(() => {
                     studentInfo.scrollIntoView({ behavior: 'smooth' });
                 }, 500);
@@ -758,44 +684,62 @@
             }
         }
 
-        // دالة عرض نتائج الترم
-        function displayTermResults(student, termNumber) {
-            const tbody = document.getElementById(`term${termNumber}Body`);
+        // دالة عرض نتائج الترم الأول فقط
+        function displayTerm1Results(student) {
+            const term1Body = document.getElementById('term1Body');
+            const summaryBody = document.getElementById('summaryBody');
             
-            // الحصول على درجات الترم
-            const attendance = parseFloat(student[`term${termNumber}_attendance`] || student[`الترم${termNumber}_الحضور`] || 0);
-            const assignment = parseFloat(student[`term${termNumber}_assignment`] || student[`الترم${termNumber}_الواجب`] || 0);
-            const final = parseFloat(student[`term${termNumber}_final`] || student[`الترم${termNumber}_الفاينال`] || 0);
+            // الحصول على درجات الترم الأول
+            const attendance = parseFloat(student["term1_attendance"] || student["الترم1_الحضور"] || student["الحضور"] || 0);
+            const assignment = parseFloat(student["term1_assignment"] || student["الترم1_الواجب"] || student["الواجب"] || 0);
+            const research = parseFloat(student["term1_research"] || student["الترم1_البحث"] || student["البحث"] || 0);
+            const midterm = parseFloat(student["term1_midterm"] || student["الترم1_الميدترم"] || student["الميدترم"] || 0);
+            const final = parseFloat(student["term1_final"] || student["الترم1_الفاينال"] || student["الفاينال"] || 0);
 
-            let html = '';
+            // عرض الدرجات في الجدول
+            term1Body.innerHTML = `
+                <tr>
+                    <td class="grade-cell">${attendance}</td>
+                    <td class="grade-cell">${assignment}</td>
+                    <td class="grade-cell">${research}</td>
+                    <td class="grade-cell">${midterm}</td>
+                    <td class="grade-cell">${final}</td>
+                </tr>
+            `;
 
-            if (termNumber === 1) {
-                const research = parseFloat(student[`term${termNumber}_research`] || student[`الترم${termNumber}_البحث`] || 0);
-                const midterm = parseFloat(student[`term${termNumber}_midterm`] || student[`الترم${termNumber}_الميدترم`] || 0);
-                
-                html = `
-                    <tr>
-                        <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${assignment}</td>
-                        <td class="grade-cell">${research}</td>
-                        <td class="grade-cell">${midterm}</td>
-                        <td class="grade-cell">${final}</td>
-                    </tr>
-                `;
-            } else {
-                html = `
-                    <tr>
-                        <td class="grade-cell">${attendance}</td>
-                        <td class="grade-cell">${assignment}</td>
-                        <td class="grade-cell">${final}</td>
-                    </tr>
-                `;
-            }
+            // حساب النسب المئوية
+            const maxAttendance = 14;
+            const maxAssignment = 290; // 280 + 10 (الواجب + البحث)
+            const maxFinal = 90; // 40 + 50 (الميدترم + الفاينال)
 
-            tbody.innerHTML = html;
+            const summaryAssignment = assignment + research;
+            const summaryFinal = midterm + final;
+
+            const attendancePerc = ((attendance / maxAttendance) * 100);
+            const assignmentPerc = ((summaryAssignment / maxAssignment) * 100);
+            const finalPerc = ((summaryFinal / maxFinal) * 100);
+
+            // تطبيق الأوزان: 25% حضور + 35% واجب + 40% فاينال
+            const weightedPercentage = (
+                (attendancePerc * 0.25) + 
+                (assignmentPerc * 0.35) + 
+                (finalPerc * 0.40)
+            ).toFixed(2);
+            
+            const grade = getGrade(parseFloat(weightedPercentage));
+
+            // عرض الملخص
+            summaryBody.innerHTML = `
+                <tr>
+                    <td class="grade-cell">${attendancePerc.toFixed(2)}%</td>
+                    <td class="grade-cell">${assignmentPerc.toFixed(2)}%</td>
+                    <td class="grade-cell">${finalPerc.toFixed(2)}%</td>
+                    <td class="grade-cell">${weightedPercentage}%</td>
+                    <td class="grade-cell ${grade.class}">${grade.text}</td>
+                </tr>
+            `;
         }
 
-        // دالة حساب التقدير بناءً على النسبة المئوية
         function getGrade(percentage) {
             if (percentage >= 85) {
                 return { text: 'امتياز', class: 'grade-excellent' };
@@ -809,124 +753,12 @@
                 return { text: 'راسب', class: 'grade-fail' };
             }
         }
-
-        // دالة عرض الملخص (بدون عمود نسبة المجموع)
-        function displaySummary(student) {
-            const summaryBody = document.getElementById('summaryBody');
-            let summaryHTML = '';
-
-            const terms = [
-                { 
-                    name: 'الترم الأول', 
-                    number: 1, 
-                    maxAttendance: 14,
-                    maxAssignment: 290, // 280 + 10 (الواجب + البحث)
-                    maxFinal: 90 // 40 + 50 (الميدترم + الفاينال)
-                },
-                { 
-                    name: 'الترم الثاني', 
-                    number: 2, 
-                    maxAttendance: 8,
-                    maxAssignment: 150,
-                    maxFinal: 50
-                },
-                { 
-                    name: 'الترم الثالث', 
-                    number: 3, 
-                    maxAttendance: 7,
-                    maxAssignment: 140,
-                    maxFinal: 50
-                }
-            ];
-
-            let attendancePercentageSum = 0;
-            let assignmentPercentageSum = 0;
-            let finalPercentageSum = 0;
-
-            terms.forEach(term => {
-                const attendance = parseFloat(student[`term${term.number}_attendance`] || student[`الترم${term.number}_الحضور`] || 0);
-                const assignment = parseFloat(student[`term${term.number}_assignment`] || student[`الترم${term.number}_الواجب`] || 0);
-                const final = parseFloat(student[`term${term.number}_final`] || student[`الترم${term.number}_الفاينال`] || 0);
-                
-                let summaryAssignment, summaryFinal, termAttendancePerc, termAssignmentPerc, termFinalPerc;
-                
-                if (term.number === 1) {
-                    const research = parseFloat(student[`term${term.number}_research`] || student[`الترم${term.number}_البحث`] || 0);
-                    const midterm = parseFloat(student[`term${term.number}_midterm`] || student[`الترم${term.number}_الميدترم`] || 0);
-                    
-                    // للترم الأول: إجمالي الواجب = الواجب + البحث، إجمالي الفاينال = الميدترم + الفاينال
-                    summaryAssignment = assignment + research;
-                    summaryFinal = midterm + final;
-                } else {
-                    summaryAssignment = assignment;
-                    summaryFinal = final;
-                }
-
-                // حساب النسبة المئوية لكل عنصر
-                termAttendancePerc = ((attendance / term.maxAttendance) * 100);
-                termAssignmentPerc = ((summaryAssignment / term.maxAssignment) * 100);
-                termFinalPerc = ((summaryFinal / term.maxFinal) * 100);
-
-                // تطبيق الأوزان الجديدة: 25% حضور + 35% واجب + 40% فاينال
-                const weightedPercentage = (
-                    (termAttendancePerc * 0.25) + 
-                    (termAssignmentPerc * 0.35) + 
-                    (termFinalPerc * 0.40)
-                ).toFixed(2);
-                
-                const grade = getGrade(parseFloat(weightedPercentage));
-
-                summaryHTML += `
-                    <tr>
-                        <td>${term.name}</td>
-                        <td class="grade-cell">${termAttendancePerc.toFixed(2)}%</td>
-                        <td class="grade-cell">${termAssignmentPerc.toFixed(2)}%</td>
-                        <td class="grade-cell">${termFinalPerc.toFixed(2)}%</td>
-                        <td class="grade-cell">${weightedPercentage}%</td>
-                        <td class="grade-cell ${grade.class}">${grade.text}</td>
-                    </tr>
-                `;
-
-                attendancePercentageSum += termAttendancePerc;
-                assignmentPercentageSum += termAssignmentPerc;
-                finalPercentageSum += termFinalPerc;
-            });
-
-            // حساب المتوسط للسنة
-            const avgAttendancePerc = (attendancePercentageSum / 3);
-            const avgAssignmentPerc = (assignmentPercentageSum / 3);
-            const avgFinalPerc = (finalPercentageSum / 3);
-
-            // تطبيق الأوزان على المتوسط السنوي
-            const overallWeightedPercentage = (
-                (avgAttendancePerc * 0.25) + 
-                (avgAssignmentPerc * 0.35) + 
-                (avgFinalPerc * 0.40)
-            ).toFixed(2);
-            
-            const overallGrade = getGrade(parseFloat(overallWeightedPercentage));
-
-            // إضافة صف الإجمالي
-            summaryHTML += `
-                <tr class="total-row">
-                    <td>إجمالي السنة</td>
-                    <td class="grade-cell">${avgAttendancePerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${avgAssignmentPerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${avgFinalPerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${overallWeightedPercentage}%</td>
-                    <td class="grade-cell ${overallGrade.class}">${overallGrade.text}</td>
-                </tr>
-            `;
-
-            summaryBody.innerHTML = summaryHTML;
-        }
         
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
             
-            // إخفاء رسالة الخطأ بعد 5 ثواني
             setTimeout(() => {
                 errorMessage.classList.add('hidden');
             }, 5000);
@@ -937,7 +769,6 @@
             successMessage.textContent = message;
             successMessage.classList.remove('hidden');
             
-            // إخفاء رسالة النجاح بعد 3 ثواني
             setTimeout(() => {
                 successMessage.classList.add('hidden');
             }, 3000);
@@ -963,7 +794,3 @@
     </script>
 </body>
 </html>
-
-
-
-
