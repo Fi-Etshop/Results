@@ -481,19 +481,15 @@
                     <tr class="term1-header">
                         <th class="grade-header">
                             <span class="header-title">الحضور</span>
-                            <span class="max-grade">14</span>
+                            <span class="max-grade">7</span>
                         </th>
                         <th class="grade-header">
                             <span class="header-title">الواجب</span>
-                            <span class="max-grade">280</span>
+                            <span class="max-grade">140</span>
                         </th>
                         <th class="grade-header">
                             <span class="header-title">البحث</span>
                             <span class="max-grade">10</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الميدترم</span>
-                            <span class="max-grade">40</span>
                         </th>
                         <th class="grade-header">
                             <span class="header-title">الفاينال</span>
@@ -687,7 +683,6 @@
             const attendance = parseFloat(student["term1_attendance"] || student["الترم1_الحضور"] || student["الحضور"] || 0);
             const assignment = parseFloat(student["term1_assignment"] || student["الترم1_الواجب"] || student["الواجب"] || 0);
             const research = parseFloat(student["term1_research"] || student["الترم1_البحث"] || student["البحث"] || 0);
-            const midterm = parseFloat(student["term1_midterm"] || student["الترم1_الميدترم"] || student["الميدترم"] || 0);
             const final = parseFloat(student["term1_final"] || student["الترم1_الفاينال"] || student["الفاينال"] || 0);
 
             // عرض الدرجات في الجدول
@@ -696,18 +691,17 @@
                     <td class="grade-cell">${attendance}</td>
                     <td class="grade-cell">${assignment}</td>
                     <td class="grade-cell">${research}</td>
-                    <td class="grade-cell">${midterm}</td>
                     <td class="grade-cell">${final}</td>
                 </tr>
             `;
 
             // حساب النسب المئوية
-            const maxAttendance = 14;
-            const maxAssignment = 290; // 280 + 10 (الواجب + البحث)
-            const maxFinal = 90; // 40 + 50 (الميدترم + الفاينال)
+            const maxAttendance = 7;
+            const maxAssignment = 150; // 140 + 10 (الواجب + البحث)
+            const maxFinal = 50; 
 
             const summaryAssignment = assignment + research;
-            const summaryFinal = midterm + final;
+            const summaryFinal = final;
 
             const attendancePerc = ((attendance / maxAttendance) * 100);
             const assignmentPerc = ((summaryAssignment / maxAssignment) * 100);
@@ -771,4 +765,5 @@
     </script>
 </body>
 </html>
+
 
