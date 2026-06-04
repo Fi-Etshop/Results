@@ -643,6 +643,14 @@
                     return;
                 }
 
+                // التحقق من حالة دفع المصاريف
+                const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
+                if (paymentStatus.toLowerCase() !== "تم الدفع" && paymentStatus.toLowerCase() !== "paid") {
+                    showPaymentError();
+                    return;
+                }
+
+
                 // عرض معلومات الطالب (مع إضافة الدفعة)
                 document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
                 document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
