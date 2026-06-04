@@ -453,7 +453,7 @@
 </head>
 <body>
     <img src="logo.png" alt="شعار المعهد" class="logo" onerror="this.style.display='none'">
-    <h1>نتيجة الترم الأول</h1>
+    <h1>نتيجة الترم الثاني</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
@@ -473,23 +473,19 @@
     </div>
 
     <div id="resultsSection" class="results-section hidden">
-        <!-- درجات الترم الأول -->
-        <h2>درجات الترم الأول</h2>
+        <!-- درجات الترم الثاني -->
+        <h2>درجات الترم الثاني</h2>
         <div class="table-container">
             <table id="term1Table">
                 <thead>
                     <tr class="term1-header">
                         <th class="grade-header">
                             <span class="header-title">الحضور</span>
-                            <span class="max-grade">7</span>
+                            <span class="max-grade">6</span>
                         </th>
                         <th class="grade-header">
                             <span class="header-title">الواجب</span>
-                            <span class="max-grade">140</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">البحث</span>
-                            <span class="max-grade">10</span>
+                            <span class="max-grade">120</span>
                         </th>
                         <th class="grade-header">
                             <span class="header-title">الفاينال</span>
@@ -501,8 +497,8 @@
             </table>
         </div>
 
-        <!-- ملخص الترم الأول -->
-        <h2>ملخص الترم الأول</h2>
+        <!-- ملخص الترم الثاني -->
+        <h2>ملخص الترم الثاني</h2>
         <div class="table-container">
             <table id="summaryTable">
                 <thead>
@@ -674,15 +670,14 @@
             }
         }
 
-        // دالة عرض نتائج الترم الأول فقط
+        // دالة عرض نتائج الترم الثاني فقط
         function displayTerm1Results(student) {
             const term1Body = document.getElementById('term1Body');
             const summaryBody = document.getElementById('summaryBody');
             
-            // الحصول على درجات الترم الأول
+            // الحصول على درجات الترم الثاني
             const attendance = parseFloat(student["term1_attendance"] || student["الترم1_الحضور"] || student["الحضور"] || 0);
             const assignment = parseFloat(student["term1_assignment"] || student["الترم1_الواجب"] || student["الواجب"] || 0);
-            const research = parseFloat(student["term1_research"] || student["الترم1_البحث"] || student["البحث"] || 0);
             const final = parseFloat(student["term1_final"] || student["الترم1_الفاينال"] || student["الفاينال"] || 0);
 
             // عرض الدرجات في الجدول
@@ -690,17 +685,16 @@
                 <tr>
                     <td class="grade-cell">${attendance}</td>
                     <td class="grade-cell">${assignment}</td>
-                    <td class="grade-cell">${research}</td>
                     <td class="grade-cell">${final}</td>
                 </tr>
             `;
 
             // حساب النسب المئوية
-            const maxAttendance = 7;
-            const maxAssignment = 150; // 140 + 10 (الواجب + البحث)
+            const maxAttendance = 6;
+            const maxAssignment = 120; 
             const maxFinal = 50; 
 
-            const summaryAssignment = assignment + research;
+            const summaryAssignment = assignment;
             const summaryFinal = final;
 
             const attendancePerc = ((attendance / maxAttendance) * 100);
