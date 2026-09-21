@@ -555,11 +555,6 @@
         // Google Sheets CSV URL - غير هذا الرابط برابطك
         const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0_qiVsOcLNpoHugx3fa2ns9Lgm0xdZHIAFXt2xZkceZr2effIwP4wLNmkiswThzerVe8YhLoJauB/pub?output=csv";
 
-        // رابط شيت درجات السنة الثانية (تاب منفصل منشور كـ CSV بنفس طريقة الرابط اللي فوق)
-        // لو سبته فاضي هتظهر السنة الثانية "لم تُرصد الدرجات بعد" لكل الطلاب
-        // ملحوظة: لو أضفت أعمدة السنة الثانية في الشيت الأساسي نفسه يشتغل برضه من غير الرابط ده
-        const YEAR2_CSV_URL = "";
-
         // الأوزان: 25% حضور + 35% واجب + 40% فاينال
         const GRADE_WEIGHTS = { attendance: 0.25, assignment: 0.35, final: 0.40 };
 
@@ -626,6 +621,7 @@
 
         // تحليل CSV
         function parseCSV(csvText) {
+            csvText = csvText.replace(/^\uFEFF/, '');
             const rows = csvText.split("\n").map(row => {
                 // التعامل مع الفواصل داخل الأقواس
                 const cells = [];
@@ -656,6 +652,12 @@
                     }
                 });
                 return student;
+            }).map(student => {
+                // توحيد شكل الرقم القومي (مسافات أو ".0" في آخره)
+                if (student["الرقم القومي"]) {
+                    student["الرقم القومي"] = student["الرقم القومي"].replace(/\s/g, '').replace(/\.0+$/, '');
+                }
+                return student;
             }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
         }
 
@@ -667,49 +669,89 @@
             return parseCSV(await response.text());
         }
 
-        // دالة جلب البيانات من Google Sheets (الشيت الأساسي + شيت السنة الثانية)
+        // دالة جلب البيانات من Google Sheets
         async function fetchStudentData() {
             try {
-                const [studentsData, year2Data] = await Promise.all([
-                    fetchSheet(GOOGLE_SHEETS_CSV_URL),
-                    YEAR2_CSV_URL ? fetchSheet(YEAR2_CSV_URL) : Promise.resolve([])
-                ]);
-
-                // دمج أعمدة السنة الثانية في بيانات الطالب بالرقم القومي
-                if (year2Data.length > 0) {
-                    const year2ByID = {};
-                    year2Data.forEach(s => { year2ByID[s["الرقم القومي"]] = s; });
-
-                    studentsData.forEach(student => {
-                        const extra = year2ByID[student["الرقم القومي"]];
-                        if (!extra) return;
-                        Object.keys(extra).forEach(key => {
-                            if (key.startsWith('السنة2_') || key.startsWith('y2_')) {
-                                student[key] = extra[key];
-                            }
-                        });
-                    });
-                }
-
-                return studentsData;
+                const studentsData = await fetchSheet(GOOGLE_SHEETS_CSV_URL);
+                return mergeDuplicateStudents(studentsData);
             } catch (error) {
                 console.error('Error fetching data from Google Sheets:', error);
                 throw error;
             }
         }
 
-        // قراءة درجة واحدة (بالاسم الإنجليزي أو العربي)
-        // السنة الأولى: term1_attendance أو الترم1_الحضور
-        // السنة الثانية: y2_term1_attendance أو السنة2_الترم1_الحضور
-        function getValue(student, year, term, key) {
+        // لو نفس الرقم القومي متكرر في الشيت: بنجمع الصفوف في طالب واحد
+        // - الاسم والكود من أول صف
+        // - حالة الدفع: أول قيمة مش فاضية
+        // - درجات كل سنة: من الصف اللي فيه درجات أكتر لنفس السنة
+        function mergeDuplicateStudents(students) {
+            const groups = new Map();
+            students.forEach(s => {
+                const id = s["الرقم القومي"];
+                if (!groups.has(id)) groups.set(id, []);
+                groups.get(id).push(s);
+            });
+
+            const result = [];
+            groups.forEach(rows => {
+                if (rows.length === 1) {
+                    result.push(rows[0]);
+                    return;
+                }
+
+                const merged = Object.assign({}, rows[0]);
+                merged["حالة الدفع"] = rows.map(r => r["حالة الدفع"]).find(v => v) || "";
+
+                YEARS.forEach(year => {
+                    let best = rows[0];
+                    let bestSum = yearDataSum(rows[0], year);
+                    rows.forEach(r => {
+                        const sum = yearDataSum(r, year);
+                        if (sum > bestSum) { best = r; bestSum = sum; }
+                    });
+
+                    year.terms.forEach(term => term.columns.forEach(col => {
+                        valueKeys(year, term, col.key).forEach(k => {
+                            merged[k] = best[k] !== undefined ? best[k] : '';
+                        });
+                    }));
+                });
+
+                result.push(merged);
+            });
+            return result;
+        }
+
+        // مجموع درجات سنة كاملة لطالب (لاختيار أفضل صف في حالة التكرار)
+        function yearDataSum(student, year) {
+            let sum = 0;
+            year.terms.forEach(term => term.columns.forEach(col => {
+                sum += getValue(student, year, term, col.key);
+            }));
+            return sum;
+        }
+
+        // أسماء الأعمدة اللي بندور عليها لدرجة واحدة (أول اسم موجود بيتاخد)
+        // الشكل الحالي في الشيت: السنة1_الترم1_الحضور ، السنة2_الترم1_الحضور
+        // بندعم كمان: y1_term1_attendance ، وللسنة الأولى الأسماء القديمة: الترم1_الحضور ، term1_attendance
+        function valueKeys(year, term, key) {
             const label = FIELD_LABELS[key];
-            const enKey = year.number === 1
-                ? `term${term.number}_${key}`
-                : `y${year.number}_term${term.number}_${key}`;
-            const arKey = year.number === 1
-                ? `الترم${term.number}_${label}`
-                : `السنة${year.number}_الترم${term.number}_${label}`;
-            return parseFloat(student[enKey] || student[arKey] || 0) || 0;
+            const keys = [
+                `السنة${year.number}_الترم${term.number}_${label}`,
+                `y${year.number}_term${term.number}_${key}`
+            ];
+            if (year.number === 1) {
+                keys.push(`الترم${term.number}_${label}`, `term${term.number}_${key}`);
+            }
+            return keys;
+        }
+
+        function getValue(student, year, term, key) {
+            for (const k of valueKeys(year, term, key)) {
+                const v = parseFloat(student[k]);
+                if (!isNaN(v)) return v;
+            }
+            return 0;
         }
 
         function weightedOf(att, asg, fin) {
