@@ -215,6 +215,14 @@
             background: linear-gradient(135deg, #2e7d32, #4caf50);
         }
         
+        .term2-header {
+            background: linear-gradient(135deg, #1976d2, #2196f3);
+        }
+        
+        .term3-header {
+            background: linear-gradient(135deg, #f57c00, #ff9800);
+        }
+        
         .summary-header {
             background: linear-gradient(135deg, #752214, #a03428);
         }
@@ -350,13 +358,35 @@
             border: 1px solid #f57c00;
             font-size: 0.9rem;
         }
-
-        .grade-excellent { color: #2e7d32; }
-        .grade-very-good { color: #1976d2; }
-        .grade-good { color: #f57c00; }
-        .grade-acceptable { color: #7b1fa2; }
-        .grade-fail { color: #d32f2f; }
         
+                .year-title {
+            max-width: 1200px;
+            margin: 50px auto 10px auto;
+            padding: 14px 20px;
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #752214, #a03428);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .year-title:first-child {
+            margin-top: 20px;
+        }
+
+        .year-note {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 15px 20px;
+            color: #666;
+            font-style: italic;
+            background: #f5f5f5;
+            border-radius: 10px;
+            border: 1px dashed #bbb;
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+        }
+
         /* Mobile specific styles */
         @media (max-width: 768px) {
             body {
@@ -449,11 +479,10 @@
             }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <img src="logo.png" alt="شعار المعهد" class="logo" onerror="this.style.display='none'">
-    <h1>نتيجة الترم الثاني</h1>
+    <h1>نتيجة الطالب</h1>
     
     <div class="container">
         <label for="nationalID">الرقم القومي</label>
@@ -466,53 +495,14 @@
 
     <!-- Student Info -->
     <div id="studentInfo" class="student-info hidden">
-        <h3>بيانات الدارس</h3>
+        <h3>معلومات الطالب</h3>
         <p><strong>الاسم:</strong> <span id="studentName"></span></p>
         <p><strong>الكود:</strong> <span id="studentCode"></span></p>
-        <p><strong>الدفعة:</strong> <span id="studentBatch"></span></p>
     </div>
 
     <div id="resultsSection" class="results-section hidden">
-        <!-- درجات الترم الثاني -->
-        <h2>درجات الترم الثاني</h2>
-        <div class="table-container">
-            <table id="term1Table">
-                <thead>
-                    <tr class="term1-header">
-                        <th class="grade-header">
-                            <span class="header-title">الحضور</span>
-                            <span class="max-grade">6</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الواجب</span>
-                            <span class="max-grade">120</span>
-                        </th>
-                        <th class="grade-header">
-                            <span class="header-title">الفاينال</span>
-                            <span class="max-grade">50</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="term1Body"></tbody>
-            </table>
-        </div>
-
-        <!-- ملخص الترم الثاني -->
-        <h2>ملخص الترم الثاني</h2>
-        <div class="table-container">
-            <table id="summaryTable">
-                <thead>
-                    <tr class="summary-header">
-                        <th>نسبة الحضور</th>
-                        <th>نسبة الواجب</th>
-                        <th>نسبة الفاينال</th>
-                        <th>النسبة المئوية</th>
-                        <th>التقدير</th>
-                    </tr>
-                </thead>
-                <tbody id="summaryBody"></tbody>
-            </table>
-        </div>
+        <!-- يتم بناء نتائج السنتين هنا بالجافاسكريبت -->
+        <div id="resultsContent"></div>
     </div>
 
     <div id="quote" class="quote hidden">
@@ -522,76 +512,184 @@
     <script>
         // حماية بسيطة من فتح أدوات المطورين
         document.addEventListener('keydown', function(e) {
+            // منع F12
             if (e.keyCode === 123) {
                 e.preventDefault();
                 return false;
             }
+            // منع Ctrl+Shift+I
             if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
                 e.preventDefault();
                 return false;
             }
+            // منع Ctrl+Shift+J
             if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
                 e.preventDefault();
                 return false;
             }
+            // منع Ctrl+U
             if (e.ctrlKey && e.keyCode === 85) {
                 e.preventDefault();
                 return false;
             }
         });
 
+        // منع النقر بالزر الأيمن
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         });
         
+        // Add Enter key support for input
         document.getElementById('nationalID').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 searchGrades();
             }
         });
 
+        // Input validation - only numbers
         document.getElementById('nationalID').addEventListener('input', function(event) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3g0ublXhkFb3-ncBoXo0kGPUQsqYatpIMaGoEM2sptHIAYwAcyhpr7V2hDs9VLgazfr1BbUR3vkl4/pub?output=csv";
+        // Google Sheets CSV URL - غير هذا الرابط برابطك
+        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0_qiVsOcLNpoHugx3fa2ns9Lgm0xdZHIAFXt2xZkceZr2effIwP4wLNmkiswThzerVe8YhLoJauB/pub?output=csv";
 
+        // رابط شيت درجات السنة الثانية (تاب منفصل منشور كـ CSV بنفس طريقة الرابط اللي فوق)
+        // لو سبته فاضي هتظهر السنة الثانية "لم تُرصد الدرجات بعد" لكل الطلاب
+        // ملحوظة: لو أضفت أعمدة السنة الثانية في الشيت الأساسي نفسه يشتغل برضه من غير الرابط ده
+        const YEAR2_CSV_URL = "";
+
+        // الأوزان: 25% حضور + 35% واجب + 40% فاينال
+        const GRADE_WEIGHTS = { attendance: 0.25, assignment: 0.35, final: 0.40 };
+
+        const FIELD_LABELS = {
+            attendance: 'الحضور',
+            assignment: 'الواجب',
+            research: 'البحث',
+            midterm: 'الميدترم',
+            final: 'الفاينال'
+        };
+
+        // group = العنصر اللي بتتحسب فيه الخانة في ملخص السنة (حضور / واجب / فاينال)
+        const YEARS = [
+            {
+                number: 1,
+                name: 'السنة الأولى',
+                hideEmptyTerms: false,
+                emptyMessage: 'لا توجد نتيجة مسجلة للسنة الأولى',
+                terms: [
+                    { number: 1, name: 'الترم الأول', headerClass: 'term1-header', columns: [
+                        { key: 'attendance', max: 14,  group: 'attendance' },
+                        { key: 'assignment', max: 280, group: 'assignment' },
+                        { key: 'research',   max: 10,  group: 'assignment' },
+                        { key: 'midterm',    max: 40,  group: 'final' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]},
+                    { number: 2, name: 'الترم الثاني', headerClass: 'term2-header', columns: [
+                        { key: 'attendance', max: 8,   group: 'attendance' },
+                        { key: 'assignment', max: 150, group: 'assignment' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]},
+                    { number: 3, name: 'الترم الثالث', headerClass: 'term3-header', columns: [
+                        { key: 'attendance', max: 7,   group: 'attendance' },
+                        { key: 'assignment', max: 140, group: 'assignment' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]}
+                ]
+            },
+            {
+                number: 2,
+                name: 'السنة الثانية',
+                hideEmptyTerms: true,
+                emptyMessage: 'لم تُرصد درجات السنة الثانية بعد',
+                terms: [
+                    { number: 1, name: 'الترم الأول', headerClass: 'term1-header', columns: [
+                        { key: 'attendance', max: 7,   group: 'attendance' },
+                        { key: 'assignment', max: 140, group: 'assignment' },
+                        { key: 'research',   max: 10,  group: 'assignment' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]},
+                    { number: 2, name: 'الترم الثاني', headerClass: 'term2-header', columns: [
+                        { key: 'attendance', max: 6,   group: 'attendance' },
+                        { key: 'assignment', max: 120, group: 'assignment' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]},
+                    { number: 3, name: 'الترم الثالث', headerClass: 'term3-header', columns: [
+                        { key: 'attendance', max: 5,   group: 'attendance' },
+                        { key: 'assignment', max: 100, group: 'assignment' },
+                        { key: 'final',      max: 50,  group: 'final' }
+                    ]}
+                ]
+            }
+        ];
+
+        // تحليل CSV
+        function parseCSV(csvText) {
+            const rows = csvText.split("\n").map(row => {
+                // التعامل مع الفواصل داخل الأقواس
+                const cells = [];
+                let currentCell = '';
+                let insideQuotes = false;
+
+                for (let i = 0; i < row.length; i++) {
+                    const char = row[i];
+                    if (char === '"') {
+                        insideQuotes = !insideQuotes;
+                    } else if (char === ',' && !insideQuotes) {
+                        cells.push(currentCell.trim());
+                        currentCell = '';
+                    } else {
+                        currentCell += char;
+                    }
+                }
+                cells.push(currentCell.trim());
+                return cells;
+            });
+
+            const headers = rows[0];
+            return rows.slice(1).map(row => {
+                const student = {};
+                row.forEach((value, index) => {
+                    if (headers[index]) {
+                        student[headers[index].trim()] = value.trim();
+                    }
+                });
+                return student;
+            }).filter(student => student["الرقم القومي"]); // فلترة الصفوف الفارغة
+        }
+
+        async function fetchSheet(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return parseCSV(await response.text());
+        }
+
+        // دالة جلب البيانات من Google Sheets (الشيت الأساسي + شيت السنة الثانية)
         async function fetchStudentData() {
             try {
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-                const csvText = await response.text();
+                const [studentsData, year2Data] = await Promise.all([
+                    fetchSheet(GOOGLE_SHEETS_CSV_URL),
+                    YEAR2_CSV_URL ? fetchSheet(YEAR2_CSV_URL) : Promise.resolve([])
+                ]);
 
-                const rows = csvText.split("\n").map(row => {
-                    const cells = [];
-                    let currentCell = '';
-                    let insideQuotes = false;
-                    
-                    for (let i = 0; i < row.length; i++) {
-                        const char = row[i];
-                        if (char === '"') {
-                            insideQuotes = !insideQuotes;
-                        } else if (char === ',' && !insideQuotes) {
-                            cells.push(currentCell.trim());
-                            currentCell = '';
-                        } else {
-                            currentCell += char;
-                        }
-                    }
-                    cells.push(currentCell.trim());
-                    return cells;
-                });
+                // دمج أعمدة السنة الثانية في بيانات الطالب بالرقم القومي
+                if (year2Data.length > 0) {
+                    const year2ByID = {};
+                    year2Data.forEach(s => { year2ByID[s["الرقم القومي"]] = s; });
 
-                const headers = rows[0];
-                const studentsData = rows.slice(1).map(row => {
-                    const student = {};
-                    row.forEach((value, index) => {
-                        if (headers[index]) {
-                            student[headers[index].trim()] = value.trim();
-                        }
+                    studentsData.forEach(student => {
+                        const extra = year2ByID[student["الرقم القومي"]];
+                        if (!extra) return;
+                        Object.keys(extra).forEach(key => {
+                            if (key.startsWith('السنة2_') || key.startsWith('y2_')) {
+                                student[key] = extra[key];
+                            }
+                        });
                     });
-                    return student;
-                }).filter(student => student["الرقم القومي"]);
+                }
 
                 return studentsData;
             } catch (error) {
@@ -600,136 +698,65 @@
             }
         }
 
-        async function searchGrades() {
-            const nationalID = document.getElementById('nationalID').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
-            const resultsSection = document.getElementById('resultsSection');
-            const studentInfo = document.getElementById('studentInfo');
-            const quote = document.getElementById('quote');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const searchButton = document.getElementById('searchButton');
-
-            errorMessage.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            studentInfo.classList.add('hidden');
-            quote.classList.add('hidden');
-
-            if (!nationalID) {
-                showError("برجاء إدخال الرقم القومي");
-                return;
-            }
-
-            if (nationalID.length !== 14) {
-                showError("الرقم القومي يجب أن يكون 14 رقم");
-                return;
-            }
-
-            loadingSpinner.classList.remove('hidden');
-            searchButton.disabled = true;
-            searchButton.textContent = 'جاري البحث...';
-
-            try {
-                const studentsData = await fetchStudentData();
-                const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
-
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
-
-                if (!student) {
-                    showError("الرقم القومي الذي أدخلته خطأ");
-                    return;
-                }
-
-                // التحقق من حالة دفع المصاريف
-                const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
-                if (paymentStatus.toLowerCase() !== "تم الدفع" && paymentStatus.toLowerCase() !== "paid") {
-                    showPaymentError();
-                    return;
-                }
-
-
-                // عرض معلومات الطالب (مع إضافة الدفعة)
-                document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
-                document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
-                document.getElementById('studentBatch').textContent = student["الدفعة"] || student["batch"] || "غير محدد";
-                studentInfo.classList.remove('hidden');
-
-                // عرض نتائج الترم الأول فقط
-                displayTerm1Results(student);
-
-                resultsSection.classList.remove('hidden');
-                quote.classList.remove('hidden');
-                
-                showSuccess("تم العثور على النتائج بنجاح!");
-
-                setTimeout(() => {
-                    studentInfo.scrollIntoView({ behavior: 'smooth' });
-                }, 500);
-
-            } catch (error) {
-                loadingSpinner.classList.add('hidden');
-                searchButton.disabled = false;
-                searchButton.textContent = 'البحث عن النتيجة';
-                showError("حدث خطأ في الاتصال بقاعدة البيانات. برجاء المحاولة مرة أخرى");
-                console.error('Error:', error);
-            }
+        // قراءة درجة واحدة (بالاسم الإنجليزي أو العربي)
+        // السنة الأولى: term1_attendance أو الترم1_الحضور
+        // السنة الثانية: y2_term1_attendance أو السنة2_الترم1_الحضور
+        function getValue(student, year, term, key) {
+            const label = FIELD_LABELS[key];
+            const enKey = year.number === 1
+                ? `term${term.number}_${key}`
+                : `y${year.number}_term${term.number}_${key}`;
+            const arKey = year.number === 1
+                ? `الترم${term.number}_${label}`
+                : `السنة${year.number}_الترم${term.number}_${label}`;
+            return parseFloat(student[enKey] || student[arKey] || 0) || 0;
         }
 
-        // دالة عرض نتائج الترم الثاني فقط
-        function displayTerm1Results(student) {
-            const term1Body = document.getElementById('term1Body');
-            const summaryBody = document.getElementById('summaryBody');
-            
-            // الحصول على درجات الترم الثاني
-            const attendance = parseFloat(student["term1_attendance"] || student["الترم1_الحضور"] || student["الحضور"] || 0);
-            const assignment = parseFloat(student["term1_assignment"] || student["الترم1_الواجب"] || student["الواجب"] || 0);
-            const final = parseFloat(student["term1_final"] || student["الترم1_الفاينال"] || student["الفاينال"] || 0);
-
-            // عرض الدرجات في الجدول
-            term1Body.innerHTML = `
-                <tr>
-                    <td class="grade-cell">${attendance}</td>
-                    <td class="grade-cell">${assignment}</td>
-                    <td class="grade-cell">${final}</td>
-                </tr>
-            `;
-
-            // حساب النسب المئوية
-            const maxAttendance = 6;
-            const maxAssignment = 120; 
-            const maxFinal = 50; 
-
-            const summaryAssignment = assignment;
-            const summaryFinal = final;
-
-            const attendancePerc = ((attendance / maxAttendance) * 100);
-            const assignmentPerc = ((summaryAssignment / maxAssignment) * 100);
-            const finalPerc = ((summaryFinal / maxFinal) * 100);
-
-            // تطبيق الأوزان: 25% حضور + 35% واجب + 40% فاينال
-            const weightedPercentage = (
-                (attendancePerc * 0.25) + 
-                (assignmentPerc * 0.35) + 
-                (finalPerc * 0.40)
-            ).toFixed(2);
-            
-            const grade = getGrade(parseFloat(weightedPercentage));
-
-            // عرض الملخص
-            summaryBody.innerHTML = `
-                <tr>
-                    <td class="grade-cell">${attendancePerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${assignmentPerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${finalPerc.toFixed(2)}%</td>
-                    <td class="grade-cell">${weightedPercentage}%</td>
-                    <td class="grade-cell ${grade.class}">${grade.text}</td>
-                </tr>
-            `;
+        function weightedOf(att, asg, fin) {
+            return att * GRADE_WEIGHTS.attendance + asg * GRADE_WEIGHTS.assignment + fin * GRADE_WEIGHTS.final;
         }
 
+        // حساب نتيجة سنة كاملة: درجات وأنسبة كل ترم + متوسط السنة
+        function evaluateYear(student, year) {
+            const terms = year.terms.map(term => {
+                const values = term.columns.map(col => getValue(student, year, term, col.key));
+                const sums = { attendance: 0, assignment: 0, final: 0 };
+                const maxes = { attendance: 0, assignment: 0, final: 0 };
+                term.columns.forEach((col, i) => {
+                    sums[col.group] += values[i];
+                    maxes[col.group] += col.max;
+                });
+
+                const att = (sums.attendance / maxes.attendance) * 100;
+                const asg = (sums.assignment / maxes.assignment) * 100;
+                const fin = (sums.final / maxes.final) * 100;
+
+                return {
+                    term, values,
+                    recorded: values.some(v => v > 0),
+                    att, asg, fin,
+                    weighted: weightedOf(att, asg, fin)
+                };
+            });
+
+            const anyData = terms.some(t => t.recorded);
+            // السنة الأولى: زي ما كانت (الترمات الثلاثة دايماً بتتحسب)
+            // السنة الثانية: لازم الترمات الثلاثة يكون ليها درجات
+            const complete = year.hideEmptyTerms ? terms.every(t => t.recorded) : anyData;
+
+            let avg = null;
+            if (complete) {
+                const n = terms.length;
+                const att = terms.reduce((s, t) => s + t.att, 0) / n;
+                const asg = terms.reduce((s, t) => s + t.asg, 0) / n;
+                const fin = terms.reduce((s, t) => s + t.fin, 0) / n;
+                avg = { att, asg, fin, weighted: weightedOf(att, asg, fin) };
+            }
+
+            return { year, terms, anyData, complete, avg };
+        }
+
+        // دالة حساب التقدير بناءً على النسبة المئوية
         function getGrade(percentage) {
             if (percentage >= 85) {
                 return { text: 'امتياز', class: 'grade-excellent' };
@@ -743,12 +770,271 @@
                 return { text: 'راسب', class: 'grade-fail' };
             }
         }
+
+        // خلايا صف الملخص (حضور % ، واجب % ، فاينال % ، النسبة ، التقدير)
+        function percentCells(p) {
+            const weighted = p.weighted.toFixed(2);
+            const grade = getGrade(parseFloat(weighted));
+            return `
+                        <td class="grade-cell">${p.att.toFixed(2)}%</td>
+                        <td class="grade-cell">${p.asg.toFixed(2)}%</td>
+                        <td class="grade-cell">${p.fin.toFixed(2)}%</td>
+                        <td class="grade-cell">${weighted}%</td>
+                        <td class="grade-cell ${grade.class}">${grade.text}</td>`;
+        }
+
+        function dashCells() {
+            return '<td class="grade-cell">—</td>'.repeat(5);
+        }
+
+        // جدول درجات ترم واحد
+        function renderTermTable(result, year) {
+            const term = result.term;
+            const headers = term.columns.map(col => `
+                        <th class="grade-header">
+                            <span class="header-title">${FIELD_LABELS[col.key]}</span>
+                            <span class="max-grade">${col.max}</span>
+                        </th>`).join('');
+            const cells = result.values.map(v => `
+                        <td class="grade-cell">${v}</td>`).join('');
+
+            return `
+        <h2>نتيجة ${term.name} - ${year.name}</h2>
+        <div class="table-container">
+            <table id="y${year.number}term${term.number}Table">
+                <thead>
+                    <tr class="${term.headerClass}">${headers}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>${cells}
+                    </tr>
+                </tbody>
+            </table>
+        </div>`;
+        }
+
+        // ملخص السنة
+        function renderYearSummary(res) {
+            const year = res.year;
+            let rows = '';
+
+            res.terms.forEach(t => {
+                if (year.hideEmptyTerms && !t.recorded) {
+                    rows += `
+                    <tr class="no-data-row">
+                        <td>${t.term.name}</td>
+                        <td colspan="5">لم تُرصد الدرجات بعد</td>
+                    </tr>`;
+                } else {
+                    rows += `
+                    <tr>
+                        <td>${t.term.name}</td>${percentCells(t)}
+                    </tr>`;
+                }
+            });
+
+            rows += `
+                    <tr class="total-row">
+                        <td>إجمالي السنة</td>${res.complete ? percentCells(res.avg) : dashCells()}
+                    </tr>`;
+
+            const note = res.complete ? '' :
+                `<div class="year-note">يظهر إجمالي السنة بعد اكتمال درجات الترمات الثلاثة</div>`;
+
+            return `
+        <h2>ملخص ${year.name}</h2>
+        <div class="table-container">
+            <table id="y${year.number}SummaryTable">
+                <thead>
+                    <tr class="summary-header">
+                        <th>الترم</th>
+                        <th>نسبة الحضور</th>
+                        <th>نسبة الواجب</th>
+                        <th>نسبة الفاينال</th>
+                        <th>النسبة المئوية</th>
+                        <th>التقدير</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}
+                </tbody>
+            </table>
+        </div>${note}`;
+        }
+
+        // قسم السنة كامل: العنوان + كل ترم + الملخص
+        function renderYear(res) {
+            const year = res.year;
+            let html = `
+        <div class="year-title">${year.name}</div>`;
+
+            if (!res.anyData) {
+                return html + `
+        <div class="year-note">${year.emptyMessage}</div>`;
+            }
+
+            res.terms.forEach(t => {
+                if (year.hideEmptyTerms && !t.recorded) {
+                    html += `
+        <h2>نتيجة ${t.term.name} - ${year.name}</h2>
+        <div class="year-note">لم تُرصد درجات هذا الترم بعد</div>`;
+                } else {
+                    html += renderTermTable(t, year);
+                }
+            });
+
+            return html + renderYearSummary(res);
+        }
+
+        // ملخص السنتين على بعض
+        function renderOverall(y1, y2) {
+            // لو مفيش أي نتيجة مكتملة نخفي الجدول
+            if (!y1.complete && !y2.complete) return '';
+
+            let total = null;
+            if (y1.complete && y2.complete) {
+                const att = (y1.avg.att + y2.avg.att) / 2;
+                const asg = (y1.avg.asg + y2.avg.asg) / 2;
+                const fin = (y1.avg.fin + y2.avg.fin) / 2;
+                total = { att, asg, fin, weighted: weightedOf(att, asg, fin) };
+            }
+
+            let note = '';
+            if (!y1.complete) {
+                note = 'لا يظهر إجمالي السنتين لعدم وجود نتيجة مسجلة للسنة الأولى';
+            } else if (!y2.complete) {
+                note = 'يظهر إجمالي السنتين بعد اكتمال درجات السنة الثانية';
+            }
+
+            return `
+        <div class="year-title">السنتان معاً</div>
+        <h2>ملخص السنتين</h2>
+        <div class="table-container">
+            <table id="overallTable">
+                <thead>
+                    <tr class="summary-header">
+                        <th>السنة</th>
+                        <th>نسبة الحضور</th>
+                        <th>نسبة الواجب</th>
+                        <th>نسبة الفاينال</th>
+                        <th>النسبة المئوية</th>
+                        <th>التقدير</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>السنة الأولى</td>${y1.complete ? percentCells(y1.avg) : dashCells()}
+                    </tr>
+                    <tr>
+                        <td>السنة الثانية</td>${y2.complete ? percentCells(y2.avg) : dashCells()}
+                    </tr>
+                    <tr class="total-row">
+                        <td>إجمالي السنتين</td>${total ? percentCells(total) : dashCells()}
+                    </tr>
+                </tbody>
+            </table>
+        </div>${note ? `
+        <div class="year-note">${note}</div>` : ''}`;
+        }
+
+        function renderAllResults(student) {
+            const y1 = evaluateYear(student, YEARS[0]);
+            const y2 = evaluateYear(student, YEARS[1]);
+            return renderYear(y1) + renderYear(y2) + renderOverall(y1, y2);
+        }
+
+        // دالة البحث عن الطالب
+        async function searchGrades() {
+            const nationalID = document.getElementById('nationalID').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const resultsSection = document.getElementById('resultsSection');
+            const studentInfo = document.getElementById('studentInfo');
+            const quote = document.getElementById('quote');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const searchButton = document.getElementById('searchButton');
+
+            // مسح النتائج السابقة
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            studentInfo.classList.add('hidden');
+            quote.classList.add('hidden');
+            document.getElementById('resultsContent').innerHTML = '';
+
+            // التحقق من صحة المدخل
+            if (!nationalID) {
+                showError("برجاء إدخال الرقم القومي");
+                return;
+            }
+
+            if (nationalID.length !== 14) {
+                showError("الرقم القومي يجب أن يكون 14 رقم");
+                return;
+            }
+
+            // عرض مؤشر التحميل
+            loadingSpinner.classList.remove('hidden');
+            searchButton.disabled = true;
+            searchButton.textContent = 'جاري البحث...';
+
+            try {
+                // جلب بيانات الطلاب
+                const studentsData = await fetchStudentData();
+                
+                // البحث عن الطالب
+                const student = studentsData.find(s => s["الرقم القومي"] === nationalID);
+
+                // إخفاء مؤشر التحميل
+                loadingSpinner.classList.add('hidden');
+                searchButton.disabled = false;
+                searchButton.textContent = 'البحث عن النتيجة';
+
+                if (!student) {
+                    showError("الرقم القومي الذي أدخلته خطأ أو لا توجد نتائج متاحة");
+                    return;
+                }
+
+                // التحقق من حالة دفع المصاريف
+                const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
+                if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
+                    showPaymentError();
+                    return;
+                }
+
+                // عرض معلومات الطالب
+                document.getElementById('studentName').textContent = student["الاسم"] || "غير محدد";
+                document.getElementById('studentCode').textContent = student["الكود"] || "غير محدد";
+                studentInfo.classList.remove('hidden');
+
+                // عرض نتائج السنتين
+                document.getElementById('resultsContent').innerHTML = renderAllResults(student);
+
+                resultsSection.classList.remove('hidden');
+                quote.classList.remove('hidden');
+                
+                showSuccess("تم العثور على النتائج بنجاح!");
+
+                // Scroll to results
+                setTimeout(() => {
+                    studentInfo.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+
+            } catch (error) {
+                loadingSpinner.classList.add('hidden');
+                searchButton.disabled = false;
+                searchButton.textContent = 'البحث عن النتيجة';
+                showError("حدث خطأ في الاتصال بقاعدة البيانات. برجاء المحاولة مرة أخرى");
+                console.error('Error:', error);
+            }
+        }
         
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
             
+            // إخفاء رسالة الخطأ بعد 5 ثواني
             setTimeout(() => {
                 errorMessage.classList.add('hidden');
             }, 5000);
@@ -759,12 +1045,13 @@
             successMessage.textContent = message;
             successMessage.classList.remove('hidden');
             
+            // إخفاء رسالة النجاح بعد 3 ثواني
             setTimeout(() => {
                 successMessage.classList.add('hidden');
             }, 3000);
         }
 
-function showPaymentError() {
+        function showPaymentError() {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.innerHTML = `
                 <div style="text-align: center;">
@@ -773,18 +1060,18 @@ function showPaymentError() {
                     <p style="font-size: 14px; color: #666;">تم حجب النتيجة لعدم استكمال مصروفات العام الدراسي</p>
                     <div style="margin-top: 20px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
                         <p style="margin: 0; font-size: 13px; color: #856404;">
-                            للاستفسار (واتساب فقط)  <br>
-                            201555981300+
+                            للاستفسار (واتساب فقط) : 01555981300<br>
+                            للدفع : https://ipn.eg/S/samirkamalghaly/instapay/9Ys2lv
                         </p>
                     </div>
                 </div>
             `;
             errorMessage.classList.remove('hidden');
         }
-        
     </script>
 </body>
 </html>
+
 
 
 
