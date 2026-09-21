@@ -997,7 +997,7 @@
 
                 // التحقق من حالة دفع المصاريف
                 const paymentStatus = student["حالة الدفع"] || student["payment_status"] || "";
-                if (paymentStatus.toLowerCase() !== "مدفوع" && paymentStatus.toLowerCase() !== "paid") {
+                if (paymentStatus.toLowerCase() !== "تم الدفع" && paymentStatus.toLowerCase() !== "paid") {
                     showPaymentError();
                     return;
                 }
@@ -1061,7 +1061,6 @@
                     <div style="margin-top: 20px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
                         <p style="margin: 0; font-size: 13px; color: #856404;">
                             للاستفسار (واتساب فقط) : 01555981300<br>
-                            للدفع : https://ipn.eg/S/samirkamalghaly/instapay/9Ys2lv
                         </p>
                     </div>
                 </div>
